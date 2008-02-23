@@ -1,4 +1,4 @@
-<?php
+<?php // BUILD: Remove line
 
 /**
  * The wrapper for the main vcalendar data. Used instead of ArrayObject

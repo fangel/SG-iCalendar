@@ -1,7 +1,7 @@
 <?php // BUILD: Remove line
 
 /**
- * A class for calculating how many seconds a duraction-string is
+ * A class for calculating how many seconds a duration-string is
  *
  * @package SG_iCalReader
  * @author Morten Fangel (C) 2008
@@ -12,12 +12,12 @@ class SG_iCal_Duration {
 	private $dur;
 	
 	/**
-	 * Constructs a new SG_iCal_Duraction from a duraction-rule.
+	 * Constructs a new SG_iCal_Duration from a duration-rule.
 	 * The basic build-up of DURATIONs are:
 	 *  (["+"] / "-") "P" (dur-date / dur-date + "T" + dur-time / dur-time / dur-week)
 	 * Is solved via a really fugly reg-exp with way to many ()'s..
 	 *
-	 * @param $duraction string
+	 * @param $duration string
 	 */
 	public function __construct( $duration ) {
 		if( $duration{0} == 'P' || (($duration{0} == '+' || $duration{0} == '-') && $duration{1} == 'P') ) {
@@ -35,11 +35,11 @@ class SG_iCal_Duration {
 			$ts += 24 * 60 * 60 * $results['days'];
 			$ts += 7 * 24 * 60 * 60 * $results['weeks'];				
 							
-			$dir = ($duraction{0} == '-') ? -1 : 1;
+			$dir = ($duration{0} == '-') ? -1 : 1;
 			
 			$this->dur = $dir * $ts;
 		} else {
-			// Invalid duraction!
+			// Invalid duration!
 			$this->dur = 0;
 		}
 	}

@@ -11,7 +11,7 @@
  *
  * @package SG_iCalReader
  * @author Morten Fangel (C) 2008
- * @license Creative Commons: Attribution-Share Alike 2.5 Denmark (http://creativecommons.org/licenses/by-sa/2.5/dk/deed.en_GB)
+ * @license http://creativecommons.org/licenses/by-sa/2.5/dk/deed.en_GB CC-BY-SA-DK
  */
 class SG_iCal_VEvent {
 	private $uid;

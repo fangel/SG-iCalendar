@@ -83,6 +83,14 @@ class SG_iCal_VEvent {
 	}
 	
 	/**
+	 * Returns the location (or null if none is given) of the event
+	 * @return string
+	 */
+	public function getLocation() {
+		return $this->location;
+	}
+	
+	/**
 	 * Returns true if the event is blocking (ie not transparent)
 	 * @return bool
 	 */

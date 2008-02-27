@@ -7,7 +7,7 @@
  * 
  * The line-type can be found by querying getIdent(), data via either
  * getData() or typecasting to a string.
- * Params can be access via the ArrayAcces. A iterator is also avilable
+ * Params can be access via the ArrayAccess. A iterator is also avilable
  * to iterator over the params.
  *
  * @package SG_iCalReader

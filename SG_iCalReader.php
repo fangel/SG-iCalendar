@@ -182,9 +182,9 @@ class SG_iCalReader {
 		$data = array();
 		$content = explode("\n", $content);
 		for( $i=0; $i < count($content); $i++) {
-			$line = $content[$i];
+			$line = rtrim($content[$i]);
 			while( isset($content[$i+1]) && strlen($content[$i+1]) > 0 && ($content[$i+1]{0} == ' ' || $content[$i+1]{0} == "\t" )) {
-				$line .= substr($content[++$i],1);
+				$line .= rtrim(substr($content[++$i],1));
 			}
 			$data[] = $line;
 		}

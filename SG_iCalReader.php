@@ -1,5 +1,7 @@
 <?php
 
+define('SG_ICALREADER_VERSION', '$Id$');
+
 /**
  * A simple iCalReader. Won't handle all the different fancy-smancy 
  * stuff. What it will do is to parse the END/BEGIN-structures into 

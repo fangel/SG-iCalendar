@@ -1,6 +1,6 @@
 <?php
 
-define('SG_ICALREADER_VERSION', '$Id$');
+define('SG_ICALREADER_VERSION', '0.2');
 
 /**
  * A simple iCalReader. Won't handle all the different fancy-smancy 

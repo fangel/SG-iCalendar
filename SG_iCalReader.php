@@ -1,6 +1,6 @@
 <?php
 
-define('SG_ICALREADER_VERSION', '0.2');
+define('SG_ICALREADER_VERSION', '0.3');
 
 /**
  * A simple iCalReader. Won't handle all the different fancy-smancy 
@@ -8,8 +8,8 @@ define('SG_ICALREADER_VERSION', '0.2');
  * a easy to parse/read php-array.
  *
  * Roadmap:
- *  * Do a proper parsing of events to make a single api to query for event start/stop, alarms etc
- *  * Parse timezones and have them affect timestamps
+ *  * Finish FREQUENCY-parsing.
+ *  * Add API for recurring events
  * 
  * A simple example:
  * <?php

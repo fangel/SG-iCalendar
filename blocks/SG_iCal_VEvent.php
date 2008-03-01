@@ -123,6 +123,14 @@ class SG_iCal_VEvent {
 	}
 	
 	/**
+	 * Returns the duration of this event in seconds
+	 * @return int
+	 */
+	public function getDuration() {
+		return $this->end - $this->start;
+	}
+	
+	/**
 	 * Calculates the timestamp from a DT line.
 	 * @param $line SG_iCal_Line
 	 * @return int

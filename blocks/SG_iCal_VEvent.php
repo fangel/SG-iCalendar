@@ -14,6 +14,7 @@
  * @license http://creativecommons.org/licenses/by-sa/2.5/dk/deed.en_GB CC-BY-SA-DK
  */
 class SG_iCal_VEvent {
+	const DEFAULT_CONFIRMED = true;
 	private $uid;
 	private $start;
 	private $end;
@@ -103,7 +104,11 @@ class SG_iCal_VEvent {
 	 * @return bool
 	 */
 	public function isConfirmed() {
-		return (isset($this->data['status']) && $this->data['status'] == 'CONFIRMED');
+		if( !isset($this->data['status']) ) {
+			return self::DEFAULT_CONFIRMED;
+		} else {
+			return $this->data['status'] == 'CONFIRMED';
+		}
 	}
 	
 	/**

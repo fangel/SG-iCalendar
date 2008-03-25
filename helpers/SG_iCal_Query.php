@@ -60,6 +60,14 @@ class SG_iCal_Query {
 		return $rtn;
 	}
 	
+	/**
+	 * Sorts the events from the calendar after the specified column.
+	 * Column can be all valid entires that getProperty can return. 
+	 * So stuff like uid, start, end, summary etc.
+	 * @param SG_iCalReader|array $ical The calendar to query
+	 * @param string $column
+	 * @return SG_iCal_VEvent[]
+	 */
 	public static function Sort( $ical, $column ) {
 		if( $ical instanceof SG_iCalReader ) {
 			$evs = $ical->getEvents();

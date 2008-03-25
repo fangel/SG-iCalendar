@@ -19,7 +19,7 @@ class SG_iCal_Line implements ArrayAccess, Countable, IteratorAggregate {
 	private $data;
 	private $params = array();
 	
-	private $replacements = array('from'=>array('\\,', '\\n', '\\;', '\\:'), 'to'=>array(',', "\n", ';', ':'));
+	private $replacements = array('from'=>array('\\,', '\\n', '\\;', '\\:', '\\"'), 'to'=>array(',', "\n", ';', ':', '"'));
 	
 	/**
 	 * Constructs a new line.

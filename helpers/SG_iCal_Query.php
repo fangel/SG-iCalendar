@@ -20,7 +20,7 @@ class SG_iCal_Query {
 	 */
 	public static function Between( $ical, $start, $end ) {
 		if( $ical instanceof SG_iCalReader ) {
-			$evs = $ical->getEvents();
+			$ical = $ical->getEvents();
 		}
 		if( !is_array($evs) ) {
 			throw new Exception('SG_iCal_Query::Between called with invalid input!');
@@ -45,7 +45,7 @@ class SG_iCal_Query {
 	 */
 	public static function After( $ical, $start ) {
 		if( $ical instanceof SG_iCalReader ) {
-			$evs = $ical->getEvents();
+			$ical = $ical->getEvents();
 		}
 		if( !is_array($ical) ) {
 			throw new Exception('SG_iCal_Query::After called with invalid input!');
@@ -70,7 +70,7 @@ class SG_iCal_Query {
 	 */
 	public static function Sort( $ical, $column ) {
 		if( $ical instanceof SG_iCalReader ) {
-			$evs = $ical->getEvents();
+			$ical = $ical->getEvents();
 		}
 		if( !is_array($ical) ) {
 			throw new Exception('SG_iCal_Query::Sort called with invalid input!');

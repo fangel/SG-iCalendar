@@ -136,13 +136,28 @@ class SG_iCal_VEvent {
 	}
 	
 	/**
+	 * Returns the given property of the event.
+	 * @param string $prop
+	 * @return string
+	 */
+	public function getProperty( $prop ) {
+		if( isset($this->$prop) ) {
+			return $this->$prop;
+		} elseif( isset($this->data[$prop]) ) {
+			return $this->data[$prop];
+		} else {
+			return null;
+		}
+	}
+	
+	/**
 	 * Calculates the timestamp from a DT line.
 	 * @param $line SG_iCal_Line
 	 * @return int
 	 */
 	private function getTimestamp( SG_iCal_Line $line ) {
 		$ts = strtotime($line->getData());
-		if( isset($data['dtend']['tzid']) ) {
+		if( isset($ts['tzid']) ) {
 			$tz = $ical->getTimeZoneInfo($line['tzid']);
 			$offset = $tz->getOffset($ts);
 			$ts = strtotime(gmdate('D, d M Y H:i:s', $ts) . ' ' . $offset);

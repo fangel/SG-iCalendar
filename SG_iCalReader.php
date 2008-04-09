@@ -205,11 +205,11 @@ class SG_iCalReader {
 		$current_data = array();
 		
 		foreach( $content AS $line ) {
-			$line = new SG_iCal_Line($line);			
+			$line = new SG_iCal_Line($line);
 			if( $line->isBegin() ) {
 				// New block of data, $section = new block
-				$section = strtolower($line);
-				$sections[] = strtolower($line);
+				$section = strtolower($line->getData());
+				$sections[] = strtolower($line->getData());
 			} elseif( $line->isEnd() ) {
 				// End of block of data ($removed = just ended block, $section = new top-block)
 				$removed = array_pop($sections);

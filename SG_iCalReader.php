@@ -160,7 +160,9 @@ class SG_iCalReader {
 		$c = curl_init();
 		curl_setopt($c, CURLOPT_URL, $this->url);
 		curl_setopt($c, CURLOPT_RETURNTRANSFER, true);
-		curl_setopt($c, CURLOPT_FOLLOWLOCATION, true);
+		if( !ini_get('safe_mode') ){
+			curl_setopt($c, CURLOPT_FOLLOWLOCATION, true);
+		}
 		$content = curl_exec($c);
 		
 		$ct = curl_getinfo($c, CURLINFO_CONTENT_TYPE);

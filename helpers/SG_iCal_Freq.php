@@ -2,18 +2,34 @@
 
 /**
  * A class to store Frequency-rules in. Will allow a easy way to find the 
- * last (previous) and next occurance of the rule.
+ * last and next occurrence of the rule.
  *
- * Still really lacking, but will parse Timezone-rules fairly decent..
+ * No - this is so not pretty. But.. ehh.. You do it better, and I will 
+ * gladly accept patches.
+ *
+ * Created by trail-and-error on the examples given in the RFC.
+ *
+ * TODO: Update to a better way of doing calculating the different options.
+ * Instead of only keeping track of the best of the current dates found
+ * it should instead keep a array of all the calculated dates within the
+ * period. 
+ * This should fix the issues with multi-rule + multi-rule interference, 
+ * and make it possible to implement the SETPOS rule.
+ * By pushing the next period onto the stack as the last option will 
+ * (hopefully) remove the need for the awful simpleMode
  *
  * @package SG_iCalReader
  * @author Morten Fangel (C) 2008
  * @license http://creativecommons.org/licenses/by-sa/2.5/dk/deed.en_GB CC-BY-SA-DK
  */
 class SG_iCal_Freq {
+	private $weekdays = array('MO'=>'monday', 'TU'=>'tuesday', 'WE'=>'wednesday', 'TH'=>'thursday', 'FR'=>'friday', 'SA'=>'saturday', 'SU'=>'sunday');
+	private $knownRules = array('month', 'weekno', 'day', 'monthday', 'yearday', 'hour', 'minute');
+	private $simpleMode = true;
+	
 	private $rules = array('freq'=>'yearly', 'interval'=>1);
 	private $start = 0;
-	private $weekdays = array('MO'=>'monday', 'TU'=>'tuesday', 'WE'=>'wednesday', 'TH'=>'thursday', 'FR'=>'friday', 'SA'=>'saturday', 'SU'=>'sunday');
+	private $freq = '';
 	
 	/**
 	 * Constructs a new Freqency-rule
@@ -21,14 +37,41 @@ class SG_iCal_Freq {
 	 * @param $start int Unix-timestamp (important!)
 	 */
 	public function __construct( $rule, $start ) {
+		$this->start = $start;
+				
 		$rules = array();
 		foreach( explode(';', $rule) AS $v) {
 			list($k, $v) = explode('=', $v);
-			$rules[ strtolower($k) ] = $v;
+			$this->rules[ strtolower($k) ] = $v;
 		}
-			
-		$this->rules += $rules;
-		$this->start = $start;
+
+		if( isset($this->rules['until']) && is_string($this->rules['until']) ) {
+			$this->rules['until'] = strtotime($this->rules['until']);
+		}
+		$this->freq = strtolower($this->rules['freq']);
+		
+
+		foreach( $this->knownRules AS $rule ) {
+			if( isset($this->rules['by' . $rule]) ) {
+				if( $this->isPrerule($rule, $this->freq) ) {
+					$this->simpleMode = false;
+				}
+			}
+		}
+		
+		if(!$this->simpleMode) {
+			if(! (isset($this->rules['byday']) || isset($this->rules['bymonthday']) || isset($this->rules['byyearday']))) {
+				$this->rules['bymonthday'] = date('d', $this->start);
+			}
+		}
+
+		if( isset($this->rules['count']) ) {
+			$n = $start;
+			for($i=0;$i<$this->rules['count'];$i++) {
+				$n = $this->findNext($n);
+			}
+			$this->rules['until'] = $n;
+		}
 	}
 	
 	/**
@@ -37,65 +80,191 @@ class SG_iCal_Freq {
 	 * @param int $offset
 	 * @return int
 	 */
-	public function lastOccurance( $offset ) {
+	public function lastOccurrence( $offset ) {
 		$t1 = $this->start;
 		while( ($t2 = $this->findNext($t1)) < $offset) {
+			if( $t2 == false ){
+				break;
+			}
 			$t1 = $t2;
 		}
 		return $t1;
 	}
 	
 	/**
-	 * Returns the next occurance of this rule after the given offset
+	 * Returns the next occurrence of this rule after the given offset
 	 * @param int $offset
 	 * @return int
 	 */
-	public function nextOccurance( $offset ) {
-		return $this->findNext( $this->lastOccurance( $offset) );
+	public function nextOccurrence( $offset ) {
+		return $this->findNext( $this->lastOccurrence( $offset) );
 	}
 	
 	/**
 	 * Calculates the next time after the given offset that the rule 
 	 * will apply.
+	 *
+	 * The approach to finding the next is as follows:
+	 * First we establish a timeframe to find timestamps in. This is
+	 * between $offset and the end of the period that $offset is in.
+	 * 
+	 * We then loop though all the rules (that is a Prerule in the 
+	 * current freq.), and finds the smallest timestamp inside the
+	 * timeframe.
+	 *
+	 * If we find something, we check if the date is a valid recurrence
+	 * (with validDate). If it is, we return it. Otherwise we try to 
+	 * find a new date inside the same timeframe (but using the new-
+	 * found date as offset)
+	 *
+	 * If no new timestamps were found in the period, we try in the 
+	 * next period
+	 *
 	 * @param int $offset
 	 * @return int
 	 */
-	private function findNext($offset) {
-		$t = $this->findStartingPoint( $offset );
-		$t = mktime(date('H', $this->start), date('i', $this->start), date('s', $this->start), date('m', $t), date('d', $t), date('Y',$t));
-		if( isset($this->rules['bymonth']) ) {
-			$t = mktime(date('H',$t), date('i',$t), date('s',$t), $this->rules['bymonth'], 1, date('Y', $t));
-		}
-		if( isset($this->rules['byday']) ) {
-			$t = $this->rule_byday($this->rules['byday'], $t);
+	public function findNext($offset) {		
+		$echo = false;
+		
+		if( $offset === false || (isset($this->rules['until']) && $this->rules['until'] <= $offset) ) {
+			if($echo) echo 'STOP: ' . date('r', $offset) . "\n";
+			return false;
 		}
 
-		return $t;
+		$found = true;
+
+		if($echo) echo 'O: ' . date('r', $offset) . "\n";
+		$hour = (in_array($this->freq, array('hourly','minutely')) && $offset > $this->start) ? date('H', $offset) : date('H', $this->start);
+		$minute = (($this->freq == 'minutely' || isset($this->rules['byminute'])) && $offset > $this->start) ? date('i', $offset) : date('i', $this->start);
+		$t = mktime($hour, $minute, date('s', $this->start), date('m', $offset), date('d', $offset), date('Y',$offset));
+		if($echo) echo 'START: ' . date('r', $t) . "\n";
+		
+		if( $this->simpleMode ) {
+			if( $offset < $t ) {
+				return $t;
+			}
+			$next = $this->findStartingPoint( $t, $this->rules['interval'], false );
+			if( !$this->validDate( $next ) ) {
+				return $this->findNext($next);
+			}
+			return $next;
+		}
+		
+		$eop = $this->findEndOfPeriod($offset);
+		if($echo) echo 'EOP: ' . date('r', $eop) . "\n";
+		
+		foreach( $this->knownRules AS $rule ) {
+			if( $found && isset($this->rules['by' . $rule]) ) {
+				if( $this->isPrerule($rule, $this->freq) ) {
+					$subrules = explode(',', $this->rules['by' . $rule]);
+					$_t = null;
+					foreach( $subrules AS $subrule ) {
+						$imm = call_user_func_array(array($this, 'ruleBy' . $rule), array($subrule, $t));
+						if( $imm === false ) {
+							break;
+						}
+						if($echo) echo strtoupper($rule) . ': ' . date('r', $imm) . ' A: ' . ((int) ($imm > $offset && $imm < $eop)) . "\n";
+						if( $imm > $offset && $imm < $eop && ($_t == null || $imm < $_t) ) {
+							$_t = $imm;
+						}
+					}
+					if( $_t !== null ) {
+						$t = $_t;
+					} else {
+						$found = $this->validDate($t);
+					}
+				}
+			}
+		}
+
+		if( $this->start > $offset && $this->start < $t ) {
+			return $this->start;
+		} else if( $found && ($t != $offset)) {
+			if( $this->validDate( $t ) ) {
+				if($echo) echo 'OK' . "\n";
+				return $t;
+			} else {
+				if($echo) echo 'Invalid' . "\n";
+				return $this->findNext($t);
+			}
+		} else {
+			if($echo) echo 'Not found' . "\n";
+			return $this->findNext( $this->findStartingPoint( $offset, $this->rules['interval'] ) );
+		} 
 	}
 	
 	/**
-	 * Finds the starting point for the next rule. It goes 'interval'
+	 * Finds the starting point for the next rule. It goes $interval
 	 * 'freq' forward in time since the given offset
+	 * @param int $offset
+	 * @param int $interval
+	 * @param boolean $truncate
+	 * @return int
+	 */
+	private function findStartingPoint( $offset, $interval, $truncate = true ) {
+		$_freq = ($this->freq == 'daily') ? 'day__' : $this->freq;
+		$t = '+' . $interval . ' ' . substr($_freq,0,-2) . 's';
+		if( $_freq == 'monthly' && $truncate ) {
+			if( $interval > 1) {
+				$offset = strtotime('+' . ($interval - 1) . ' months ', $offset);
+			}
+			$t = '+' . (date('t', $offset) - date('d', $offset) + 1) . ' days';
+		}
+
+		$sp = strtotime($t, $offset);
+		
+		if( $truncate ) {
+			$sp = $this->truncateToPeriod($sp, $this->freq);
+		}
+		
+		return $sp;
+	}
+	
+	/**
+	 * Finds the earliest timestamp posible outside this perioid
 	 * @param int $offset
 	 * @return int
 	 */
-	private function findStartingPoint( $offset ) {
-		$freq = strtolower($this->rules['freq']);
+	public function findEndOfPeriod($offset) {
+		return $this->findStartingPoint($offset, 1);
+	}
+	
+	/**
+	 * Resets the timestamp to the beginning of the
+	 * period specified by freq
+	 * 
+	 * Yes - the fall-through is on purpose!
+	 *
+	 * @param int $time
+	 * @param int $freq
+	 * @return int
+	 */
+	private function truncateToPeriod( $time, $freq ) {
+		$date = getdate($time);
 		switch( $freq ) {
-			case "daily":
-				$freq = "day__"; // nice hack here
 			case "yearly":
+				$date['mon'] = 1;
 			case "monthly":
-			case "weekly":
-			case "hourly":
+				$date['mday'] = 1;
+			case "daily":
+				$date['hours'] = 0;
+			case 'hourly':
+				$date['minutes'] = 0;
 			case "minutely":
-				$t = '+' . $this->rules['interval'] . ' ' . substr($freq,0,-2) . 's';
-				$sp = strtotime($t, $offset);
+				$date['seconds'] = 0;
 				break;
-			default:
-				$sp = $this->start + 1;
+			case "weekly":
+				if( date('N', $time) == 1) {
+					$date['hours'] = 0;
+					$date['minutes'] = 0;
+					$date['seconds'] = 0;
+				} else {
+					$date = getdate(strtotime("last monday 0:00", $time));
+				}
+				break;
 		}
-		return $sp;
+		$d = mktime($date['hours'], $date['minutes'], $date['seconds'], $date['mon'], $date['mday'], $date['year']);
+		return $d;
 	}
 	
 	/**
@@ -104,20 +273,177 @@ class SG_iCal_Freq {
 	 * @param int $t
 	 * @return int
 	 */
-	private function rule_byday($rule, $t) {
+	private function ruleByday($rule, $t) {
 		$dir = ($rule{0} == '-') ? -1 : 1;
 		$dir_t = ($dir == 1) ? 'next' : 'last';
-		$c = preg_replace('/[^0-9]/','',$rule);
+		
+		
 		$d = $this->weekdays[substr($rule,-2)];
-		if( $dir == -1 ) {
-			// We are going backworks, so add a month so we can
-			// back up again
-			$t = strtotime("+1 month", $t);
+		$s = $dir_t . ' ' . $d . ' ' . date('H:i:s',$t);
+		
+		if( $rule == substr($rule, -2) ) {
+			if( date('l', $t) == ucfirst($d) ) {
+				$s = 'today ' . date('H:i:s',$t);
+			}
+			
+			$_t = strtotime($s, $t);
+			
+			if( $_t == $t && in_array($this->freq, array('monthly', 'yearly')) ) {
+				// Yes. This is not a great idea.. but hey, it works.. for now
+				$s = 'next ' . $d . ' ' . date('H:i:s',$t);
+				$_t = strtotime($s, $_t);
+			}
+			
+			return $_t;
+		} else {
+			$_f = $this->freq;
+			if( isset($this->rules['bymonth']) && $this->freq == 'yearly' ) {
+				$this->freq = 'monthly';
+			}
+			if( $dir == -1 ) {
+				$_t = $this->findEndOfPeriod($t);
+			} else {
+				$_t = $this->truncateToPeriod($t, $this->freq);
+			}
+			$this->freq = $_f;
+			
+			$c = preg_replace('/[^0-9]/','',$rule);
+			$c = ($c == '') ? 1 : $c;
+			
+			$n = $_t;
+			while($c > 0 ) {
+				if( $dir == 1 && $c == 1 && date('l', $t) == ucfirst($d) ) {
+					$s = 'today ' . date('H:i:s',$t);
+				}
+				$n = strtotime($s, $n);
+				$c--;
+			}
+			
+			return $n;
 		}
-		while($c > 0 ) {
-			$t = strtotime($dir_t . ' ' . $d . ' ' . date('H:i:s',$t), $t);
-			$c--;
+	}
+	
+	private function ruleBymonth($rule, $t) {
+		$_t = mktime(date('H',$t), date('i',$t), date('s',$t), $rule, date('d', $t), date('Y', $t));
+		if( $t == $_t && isset($this->rules['byday']) ) {
+			// TODO: this should check if one of the by*day's exists, and have a multi-day value
+			return false;
+		} else {
+			return $_t;
 		}
-		return $t;
+	}
+	
+	private function ruleBymonthday($rule, $t) {
+		if( $rule < 0 ) {
+			$rule = date('t', $t) + $rule + 1;
+		}
+		return mktime(date('H',$t), date('i',$t), date('s',$t), date('m', $t), $rule, date('Y', $t));
+	}
+	
+	private function ruleByyearday($rule, $t) {
+		if( $rule < 0 ) {
+			$_t = $this->findEndOfPeriod();
+			$d = '-';
+		} else {
+			$_t = $this->truncateToPeriod($t, $this->freq);
+			$d = '+';
+		}
+		$s = $d . abs($rule -1) . ' days ' . date('H:i:s',$t);
+		return strtotime($s, $_t);
+	}
+
+	private function ruleByweekno($rule, $t) {
+		if( $rule < 0 ) {
+			$_t = $this->findEndOfPeriod();
+			$d = '-';
+		} else {
+			$_t = $this->truncateToPeriod($t, $this->freq);
+			$d = '+';
+		}		
+
+		$sub = (date('W', $_t) == 1) ? 2 : 1;
+		$s = $d . abs($rule - $sub) . ' weeks ' . date('H:i:s',$t);
+		$_t  = strtotime($s, $_t);
+		
+		return $_t;
+	}
+
+	private function ruleByhour($rule, $t) {
+		$_t = mktime($rule, date('i',$t), date('s',$t), date('m',$t), date('d', $t), date('Y', $t));
+		return $_t;
+	}
+	
+	private function ruleByminute($rule, $t) {
+		$_t = mktime(date('h',$t), $rule, date('s',$t), date('m',$t), date('d', $t), date('Y', $t));
+		return $_t;
+	}
+	
+	private function validDate( $t ) {
+		if( isset($this->rules['until']) && $this->rules['until'] <= $t ) {
+			return false;
+		}
+		
+		if( isset($this->rules['bymonth']) ) {
+			$months = explode(',', $this->rules['bymonth']);
+			if( !in_array(date('m', $t), $months)) {
+				return false;
+			}
+		}
+		if( isset($this->rules['byday']) ) {
+			$days = explode(',', $this->rules['byday']);
+			foreach( $days As $i => $k ) {
+				$days[$i] = $this->weekdays[ preg_replace('/[^A-Z]/', '', $k)];
+			}
+			if( !in_array(strtolower(date('l', $t)), $days)) {
+				return false;
+			}
+		}
+		if( isset($this->rules['byweekno']) ) {
+			$weeks = explode(',', $this->rules['byweekno']);
+			if( !in_array(date('W', $t), $weeks)) {
+				return false;
+			}
+		}
+		if( isset($this->rules['bymonthday'])) {
+			$weekdays = explode(',', $this->rules['bymonthday']);
+			foreach( $weekdays As $i => $k ) {
+				if( $k < 0 ) {
+					$weekdays[$i] = date('t', $t) + $k + 1;
+				}
+			}
+			if( !in_array(date('d', $t), $weekdays)) {
+				return false;
+			}
+		}
+		if( isset($this->rules['byhour']) ) {
+			$hours = explode(',', $this->rules['byhour']);
+			if( !in_array(date('H', $t), $hours)) {
+				return false;
+			}
+		}
+		
+		return true;
+	}
+	
+	private function isPrerule($rule, $freq) {
+		if( $rule == 'year')
+			return false;
+		if( $rule == 'month' && $freq == 'yearly')
+			return true;
+		if( $rule == 'monthday' && in_array($freq, array('yearly', 'monthly')) && !isset($this->rules['byday']))
+			return true;
+		// TODO: is it faster to do monthday first, and ignore day if monthday exists? - prolly by a factor of 4..
+		if( $rule == 'yearday' && $freq == 'yearly' )
+			return true;
+		if( $rule == 'weekno' && $freq == 'yearly' )
+			return true;
+		if( $rule == 'day' && in_array($freq, array('yearly', 'monthly', 'weekly')))
+			return true;
+		if( $rule == 'hour' && in_array($freq, array('yearly', 'monthly', 'weekly', 'daily'))) 
+			return true;
+		if( $rule == 'minute' ) 
+			return true;
+			
+		return false;
 	}
 }

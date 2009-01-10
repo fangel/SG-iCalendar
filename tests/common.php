@@ -10,6 +10,7 @@ require_once dirname(__FILE__) . "/../helpers/SG_iCal_Duration.php";
 require_once dirname(__FILE__) . "/../helpers/SG_iCal_Factory.php";
 require_once dirname(__FILE__) . "/../helpers/SG_iCal_Freq.php";
 require_once dirname(__FILE__) . "/../helpers/SG_iCal_Line.php";
+require_once dirname(__FILE__) . "/../helpers/SG_iCal_Parser.php";
 require_once dirname(__FILE__) . "/../helpers/SG_iCal_Query.php";
 
 ?>

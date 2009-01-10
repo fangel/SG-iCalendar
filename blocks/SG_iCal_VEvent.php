@@ -29,7 +29,7 @@ class SG_iCal_VEvent {
 	 * @param SG_iCal_Line[] $data
 	 * @param SG_iCalReader $ical
 	 */
-	public function __construct($data, SG_iCalReader $ical ) {
+	public function __construct($data, SG_iCal $ical ) {
 		$this->uid = $data['uid']->getData();
 		unset($data['uid']);
 		

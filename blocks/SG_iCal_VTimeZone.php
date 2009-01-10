@@ -70,7 +70,7 @@ class SG_iCal_VTimeZone {
 		}
 		
 		$daylight_freq = new SG_iCal_Freq($this->daylight['rrule'], strtotime($this->daylight['dtstart']));
-		$last_dst = $daylight_freq->lastOccurance($ts);
+		$last_dst = $daylight_freq->lastOccurrence($ts);
 		if( date('Y') == date('Y', $last_dst) ) {
 			$this->cache[$ts] = 'daylight';
 		} else {

@@ -23,7 +23,7 @@ class SG_iCal_Factory {
 	 * @param $section string
 	 * @param SG_iCal_Line[]
 	 */
-	public static function factory( SG_iCalReader $ical, $section, $data ) {
+	public static function factory( SG_iCal $ical, $section, $data ) {
 		switch( $section ) {
 			case "vcalendar":
 				require_once dirname(__FILE__).'/../blocks/SG_iCal_VCalendar.php'; // BUILD: Remove line

@@ -1,8 +1,23 @@
 <?php
 
 class SG_iCal_Parser {
+	/**
+	 * Fetches $url and passes it on to be parsed
+	 * @param string $url
+	 * @param SG_iCal $ical
+	 */
 	public static function Parse( $url, SG_iCal $ical ) {
 		$content = self::Fetch( $url );
+		$content = self::UnfoldLines($content);
+		self::_Parse( $content, $ical );
+	}
+	
+	/**
+	 * Passes a text string on to be parsed
+	 * @param string $content
+	 * @param SG_iCal $ical
+	 */
+	public static function ParseString($content, SG_iCal $ical ) {
 		$content = self::UnfoldLines($content);
 		self::_Parse( $content, $ical );
 	}
@@ -59,6 +74,8 @@ class SG_iCal_Parser {
 	/**
 	 * Parses the feed found in content and calls storeSection to store
 	 * parsed data
+	 * @param string $content
+	 * @param SG_iCal $ical
 	 */
 	private static function _Parse( $content, SG_iCal $ical ) {
 		$main_sections = array('vevent', 'vjournal', 'vtodo', 'vtimezone', 'vcalendar');
@@ -103,7 +120,10 @@ class SG_iCal_Parser {
 	}
 
 	/**
-	 * Stores the data in the parsed_data member
+	 * Stores the data in provided SG_iCal object
+	 * @param string $section eg 'vcalender', 'vevent' etc
+	 * @param string $data
+	 * @param SG_iCal $ical
 	 */
 	protected static function storeSection( $section, $data, SG_iCal $ical ) {
 		$data = SG_iCal_Factory::Factory($ical, $section, $data);
@@ -127,6 +147,7 @@ class SG_iCal_Parser {
 	 * The function is from the book "Building Scalable Web Sites" by 
 	 * Cal Henderson.
 	 *
+	 * @param string $data
 	 * @return bool
 	 */
 	private static function _ValidUtf8( $data ) {

@@ -125,7 +125,8 @@ class SG_iCal_Freq {
 	 */
 	public function findNext($offset) {		
 		$echo = false;
-		
+
+		//make sure the offset is valid
 		if( $offset === false || (isset($this->rules['until']) && $this->rules['until'] <= $offset) ) {
 			if($echo) echo 'STOP: ' . date('r', $offset) . "\n";
 			return false;
@@ -133,6 +134,8 @@ class SG_iCal_Freq {
 
 		$found = true;
 
+		//set the timestamp of the offset (ignoring hours and minutes unless we want them to be
+		//part of the calculations.
 		if($echo) echo 'O: ' . date('r', $offset) . "\n";
 		$hour = (in_array($this->freq, array('hourly','minutely')) && $offset > $this->start) ? date('H', $offset) : date('H', $this->start);
 		$minute = (($this->freq == 'minutely' || isset($this->rules['byminute'])) && $offset > $this->start) ? date('i', $offset) : date('i', $this->start);

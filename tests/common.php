@@ -1,6 +1,6 @@
 <?php
 
-require_once dirname(__FILE__) . "/../SG_iCalReader.php";
+require_once dirname(__FILE__) . "/../SG_iCal.php";
 
 require_once dirname(__FILE__) . "/../blocks/SG_iCal_VCalendar.php";
 require_once dirname(__FILE__) . "/../blocks/SG_iCal_VEvent.php";

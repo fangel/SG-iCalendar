@@ -3,7 +3,10 @@
 require_once dirname(__FILE__) . '/../common.php';
 require_once 'PHPUnit/Framework.php';
 
+date_default_timezone_set('Europe/Copenhagen');
+
 class FreqTest extends PHPUnit_Framework_TestCase {
+
 	public function testDailyCount() {
 		$dateset = array(
 			873183600,
@@ -609,7 +612,7 @@ class FreqTest extends PHPUnit_Framework_TestCase {
 		do {
 			$n = $freq->findNext($n);
 			$e = (current($dateset) != -1) ? current($dateset) : false;
-			$this->assertEquals($n, $e);
+			$this->assertEquals($e, $n);
 		} while( next($dateset) !== false );
 	}
 }

@@ -3,9 +3,11 @@
 require_once dirname(__FILE__) . '/../common.php';
 require_once 'PHPUnit/Framework.php';
 
-date_default_timezone_set('Europe/Copenhagen');
-
 class FreqTest extends PHPUnit_Framework_TestCase {
+
+	public function setUp() {
+		date_default_timezone_set('Europe/Copenhagen');
+	}
 
 	public function testDailyCount() {
 		$dateset = array(

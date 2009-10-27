@@ -107,8 +107,9 @@ class SG_iCal_Line implements ArrayAccess, Countable, IteratorAggregate {
 	 * @see ArrayAccess.offsetGet
 	 */
 	public function offsetGet( $param ) {
-		if( $this->hasParam( $param ) ) {
-			return $this->params[ strtolower($param) ];
+		$index = strtolower($param);
+		if (isset($this->params[ $index ])) {
+			return $this->params[ $index ];
 		}
 	}
 	

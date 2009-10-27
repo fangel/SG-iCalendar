@@ -33,6 +33,11 @@ class SG_iCal_VEvent {
 	public function __construct($data, SG_iCal $ical ) {
 		$this->uid = $data['uid']->getData();
 		unset($data['uid']);
+
+		if ( isset($data['rrule']) ) {
+			$this->recurrence = new SG_iCal_Recurrence($data['rrule']);
+			unset($data['rrule']);
+		}
 		
 		if( isset($data['dtstart']) ) {
 			$this->start = $this->getTimestamp( $data['dtstart'], $ical );
@@ -47,6 +52,19 @@ class SG_iCal_VEvent {
 			$dur = new SG_iCal_Duration( $data['duration']->getData() );
 			$this->end = $this->start + $dur->getDuration();
 			unset($data['duration']);
+		} elseif ( isset($this->recurrence) ) {
+			//if there is a recurrence rule
+			$until = $this->recurrence->getUntil();
+			$count = $this->recurrence->getCount();
+			//check if there is either 'until' or 'count' set
+			if ( $this->recurrence->getUntil() or $this->recurrence->getCount() ) {
+				//if until is set, set that as the end date (using getTimeStamp)
+				if ( $until ) {
+					$this->end = strtotime( $until );
+				}
+				//if count is set, then figure out the last occurrence and set that as the end date
+			}
+			
 		}
 
 		$imports = array('summary','description','location');

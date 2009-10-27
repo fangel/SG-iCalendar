@@ -84,6 +84,9 @@ class SG_iCal {
 		if( $tzid == null ) {
 			return $this->timezones;
 		} else {
+			if ( !isset($this->timezones)) {
+				return null;
+			}
 			foreach( $this->timezones AS $tz ) {
 				if( $tz->getTimeZoneId() == $tzid ) {
 					return $tz;

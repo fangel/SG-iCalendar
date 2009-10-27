@@ -18,6 +18,7 @@ class SG_iCal_VEvent {
 	private $uid;
 	private $start;
 	private $end;
+	private $recurrence;
 	private $summary;
 	private $description;
 	private $location;
@@ -34,12 +35,12 @@ class SG_iCal_VEvent {
 		unset($data['uid']);
 		
 		if( isset($data['dtstart']) ) {
-			$this->start = $this->getTimestamp( $data['dtstart'] );
+			$this->start = $this->getTimestamp( $data['dtstart'], $ical );
 			unset($data['dtstart']);
 		}
 		
 		if( isset($data['dtend']) ) {
-			$this->end = $this->getTimestamp($data['dtend']);
+			$this->end = $this->getTimestamp($data['dtend'], $ical);
 			unset($data['dtend']);
 		} elseif( isset($data['duration']) ) {
 			require_once dirname(__FILE__).'/../helpers/SG_iCal_Duration.php'; // BUILD: Remove line
@@ -155,12 +156,12 @@ class SG_iCal_VEvent {
 	 * @param $line SG_iCal_Line
 	 * @return int
 	 */
-	private function getTimestamp( SG_iCal_Line $line ) {
+	private function getTimestamp( SG_iCal_Line $line, SG_iCal $ical ) {
 		$ts = strtotime($line->getData());
-		if( isset($ts['tzid']) ) {
+		if( isset($line['tzid']) ) {
 			$tz = $ical->getTimeZoneInfo($line['tzid']);
 			$offset = $tz->getOffset($ts);
-			$ts = strtotime(gmdate('D, d M Y H:i:s', $ts) . ' ' . $offset);
+			$ts = strtotime(date('D, d M Y H:i:s', $ts) . ' ' . $offset);
 		}
 		return $ts;
 	}

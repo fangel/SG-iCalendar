@@ -141,7 +141,7 @@ class SG_iCal_Recurrence {
 	}
 
 	/**
-	 *
+	 * Corresponds to BYHOUR in RFC 2445.
 	 * @return mixed string if the member has been set, false otherwise
 	 */
 	public function getByHour() {
@@ -149,7 +149,7 @@ class SG_iCal_Recurrence {
 	}
 
 	/**
-	 *
+	 *Corresponds to BYDAY in RFC 2445.
 	 * @return mixed string if the member has been set, false otherwise
 	 */
 	public function getByDay() {
@@ -157,7 +157,7 @@ class SG_iCal_Recurrence {
 	}
 
 	/**
-	 *
+	 * Corresponds to BYMONTHDAY in RFC 2445.
 	 * @return mixed string if the member has been set, false otherwise
 	 */
 	public function getByMonthDay() {
@@ -165,7 +165,7 @@ class SG_iCal_Recurrence {
 	}
 
 	/**
-	 *
+	 * Corresponds to BYYEARDAY in RFC 2445.
 	 * @return mixed string if the member has been set, false otherwise
 	 */
 	public function getByYearDay() {
@@ -173,7 +173,7 @@ class SG_iCal_Recurrence {
 	}
 
 	/**
-	 *
+	 * Corresponds to BYYEARNO in RFC 2445.
 	 * @return mixed string if the member has been set, false otherwise
 	 */
 	public function getByYearNo() {
@@ -181,7 +181,7 @@ class SG_iCal_Recurrence {
 	}
 
 	/**
-	 *
+	 * Corresponds to BYMONTH in RFC 2445.
 	 * @return mixed string if the member has been set, false otherwise
 	 */
 	public function getByMonth() {
@@ -189,7 +189,7 @@ class SG_iCal_Recurrence {
 	}
 
 	/**
-	 *
+	 * Corresponds to BYSETPOS in RFC 2445.
 	 * @return mixed string if the member has been set, false otherwise
 	 */
 	public function getBySetPos() {
@@ -197,7 +197,7 @@ class SG_iCal_Recurrence {
 	}
 
 	/**
-	 *
+	 * Corresponds to WKST in RFC 2445.
 	 * @return mixed string if the member has been set, false otherwise
 	 */
 	public function getWkst() {

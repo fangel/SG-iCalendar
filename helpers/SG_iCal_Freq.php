@@ -80,7 +80,7 @@ class SG_iCal_Freq {
 	 * @param int $offset
 	 * @return int
 	 */
-	public function lastOccurrence( $offset ) {
+	public function previousOccurrence( $offset ) {
 		$t1 = $this->start;
 		while( ($t2 = $this->findNext($t1)) < $offset) {
 			if( $t2 == false ){
@@ -97,7 +97,7 @@ class SG_iCal_Freq {
 	 * @return int
 	 */
 	public function nextOccurrence( $offset ) {
-		return $this->findNext( $this->lastOccurrence( $offset) );
+		return $this->findNext( $this->previousOccurrence( $offset) );
 	}
 	
 	/**

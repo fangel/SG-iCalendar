@@ -49,7 +49,7 @@ class FreqTest extends PHPUnit_Framework_TestCase {
 		$this->assertRule( $rule, $start, $dateset);
 		
 		$freq = new SG_iCal_Freq($rule, $start);
-		$this->assertEquals(882864000, $freq->lastOccurrence(time()));
+		$this->assertEquals(882864000, $freq->previousOccurrence(time()));
 	}
 	
 	public function testDailyInterval() {
@@ -118,7 +118,7 @@ class FreqTest extends PHPUnit_Framework_TestCase {
 			$this->assertRule( $rule, $start, $datesets[2]);
 			
 			$freq = new SG_iCal_Freq($rule, $start);
-			$this->assertEquals(949305600, $freq->lastOccurrence(time()));
+			$this->assertEquals(949305600, $freq->previousOccurrence(time()));
 		}
 	}
 	
@@ -160,7 +160,7 @@ class FreqTest extends PHPUnit_Framework_TestCase {
 		$this->assertRule( $rule, $start, $dateset);
 		
 		$freq = new SG_iCal_Freq($rule, $start);
-		$this->assertEquals(882864000, $freq->lastOccurrence(time()), 'Failed getting correct end date');
+		$this->assertEquals(882864000, $freq->previousOccurrence(time()), 'Failed getting correct end date');
 	}
 	
 	public function testWeeklyBydayLimit() {
@@ -206,7 +206,7 @@ class FreqTest extends PHPUnit_Framework_TestCase {
 		$this->assertRule( $rule, $start, $dateset);
 		
 		$freq = new SG_iCal_Freq($rule, $start);
-		$this->assertEquals(882777600, $freq->lastOccurrence(time()), 'Failed getting correct end date');
+		$this->assertEquals(882777600, $freq->previousOccurrence(time()), 'Failed getting correct end date');
 	}
 	
 	public function testWeeklyIntervalBydayCount() {

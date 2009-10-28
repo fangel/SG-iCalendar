@@ -75,7 +75,7 @@ class SG_iCal_Freq {
 	}
 	
 	/**
-	 * Returns the last (most recent) occurance of the rule from the 
+	 * Returns the previous (most recent) occurrence of the rule from the
 	 * given offset
 	 * @param int $offset
 	 * @return int
@@ -98,6 +98,20 @@ class SG_iCal_Freq {
 	 */
 	public function nextOccurrence( $offset ) {
 		return $this->findNext( $this->previousOccurrence( $offset) );
+	}
+
+	/**
+	 * Finds the absolute last occurrence of the rule from the given offset.
+	 * @return int timestamp
+	 */
+	public function lastOccurrence() {
+		$temp_timestamp = $this->findNext($this->start);
+		$timestamp = 0;
+		while ($temp_timestamp) {
+			$timestamp = $temp_timestamp;
+			$temp_timestamp = $this->findNext($temp_timestamp);
+		}
+		return $timestamp;
 	}
 	
 	/**

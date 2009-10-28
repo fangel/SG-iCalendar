@@ -604,6 +604,13 @@ class FreqTest extends PHPUnit_Framework_TestCase {
 			$this->assertRule( $rule, $start, $dateset);
 		}
 	}
+
+	public function testLastOccurrence() {
+		$rule = 'FREQ=YEARLY;INTERVAL=2;BYYEARDAY=1;COUNT=5';
+		$start = strtotime('2009-10-27T090000');
+		$freq = new SG_iCal_Freq($rule, $start);
+		$this->assertEquals(strtotime('2018-01-01T09:00:00'), $freq->lastOccurrence());
+	}
 	
 	// TODO: WKST rule
 	

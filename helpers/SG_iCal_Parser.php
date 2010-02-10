@@ -23,27 +23,41 @@ class SG_iCal_Parser {
 	}
 	
 	/**
-	 * Fetches url and stores it in the content member
+	 * Fetches a resource and tries to make sure it's UTF8
+	 * encoded
 	 * @return string
 	 */
-	protected static function Fetch( $url ) {
-		$c = curl_init();
+	protected static function Fetch( $resource ) {
 		$is_utf8 = true;
-		curl_setopt($c, CURLOPT_URL, $url);
-		curl_setopt($c, CURLOPT_RETURNTRANSFER, true);
-		if( !ini_get('safe_mode') ){
-			curl_setopt($c, CURLOPT_FOLLOWLOCATION, true);
-		}
-		$content = curl_exec($c);
 		
-		$ct = curl_getinfo($c, CURLINFO_CONTENT_TYPE);
-		$enc = preg_replace('/^.*charset=([-a-zA-Z0-9]+).*$/', '$1', $ct);
-		if( $ct != '' && strtolower(str_replace('-','', $enc)) != 'utf8' ) {
-			// Well, the encoding says it ain't utf-8
-			$is_utf8 = false;
-		} elseif( ! self::_ValidUtf8( $content ) ) {
-			// The data isn't utf-8
-			$is_utf8 = false;
+		if( is_file( $resource ) ) {
+			// The resource is a local file
+			$content = file_get_contents($resource);
+
+			if( ! self::_ValidUtf8( $content ) ) {
+				// The file doesn't appear to be UTF8
+				$is_utf8 = false;
+			}
+		} else {
+			// The resource isn't local, so it's assumed to
+			// be a URL
+			$c = curl_init();
+			curl_setopt($c, CURLOPT_URL, $resource);
+			curl_setopt($c, CURLOPT_RETURNTRANSFER, true);
+			if( !ini_get('safe_mode') ){
+				curl_setopt($c, CURLOPT_FOLLOWLOCATION, true);
+			}
+			$content = curl_exec($c);
+
+			$ct = curl_getinfo($c, CURLINFO_CONTENT_TYPE);
+			$enc = preg_replace('/^.*charset=([-a-zA-Z0-9]+).*$/', '$1', $ct);
+			if( $ct != '' && strtolower(str_replace('-','', $enc)) != 'utf8' ) {
+				// Well, the encoding says it ain't utf-8
+				$is_utf8 = false;
+			} elseif( ! self::_ValidUtf8( $content ) ) {
+				// The data isn't utf-8
+				$is_utf8 = false;
+			}
 		}
 		
 		if( !$is_utf8 ) {

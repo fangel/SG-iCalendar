@@ -14,6 +14,8 @@
  */
 class SG_iCal_Recurrence {
 
+	public $rrule;
+	
 	protected $freq;
 
 	protected $until;
@@ -59,6 +61,7 @@ class SG_iCal_Recurrence {
 		//split up the properties
 		$recurProperties = explode(';', $line);
 		$recur = array();
+		$this->rrule = $line;
 
 		//loop through the properties in the line and set their associated
 		//member variables

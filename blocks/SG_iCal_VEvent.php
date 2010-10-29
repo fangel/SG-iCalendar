@@ -18,6 +18,7 @@ class SG_iCal_VEvent {
 	private $uid;
 	private $start;
 	private $end;
+	private $lastend;
 	private $recurrence;
 	private $summary;
 	private $description;
@@ -52,7 +53,10 @@ class SG_iCal_VEvent {
 			$dur = new SG_iCal_Duration( $data['duration']->getData() );
 			$this->end = $this->start + $dur->getDuration();
 			unset($data['duration']);
-		} elseif ( isset($this->recurrence) ) {
+		}
+		
+		//google cal set dtend as end of initial event
+		if ( isset($this->recurrence) ) {
 			//if there is a recurrence rule
 			$until = $this->recurrence->getUntil();
 			$count = $this->recurrence->getCount();
@@ -60,7 +64,7 @@ class SG_iCal_VEvent {
 			if ( $this->recurrence->getUntil() or $this->recurrence->getCount() ) {
 				//if until is set, set that as the end date (using getTimeStamp)
 				if ( $until ) {
-					$this->end = strtotime( $until );
+					$this->lastend = strtotime( $until );
 				}
 				//if count is set, then figure out the last occurrence and set that as the end date
 			}
@@ -143,7 +147,7 @@ class SG_iCal_VEvent {
 	 * @return int
 	 */
 	public function getEnd() {
-		return $this->end;
+		return max($this->end,$this->lastend);
 	}
 	
 	/**

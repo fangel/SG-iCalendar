@@ -97,7 +97,8 @@ class SG_iCal_Freq {
 	 * @return int
 	 */
 	public function nextOccurrence( $offset ) {
-		return $this->findNext( $this->previousOccurrence( $offset) );
+		//return $this->findNext( $this->previousOccurrence( $offset) );
+		return $this->findNext($offset);
 	}
 
 	/**

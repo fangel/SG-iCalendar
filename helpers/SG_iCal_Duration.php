@@ -20,32 +20,30 @@ class SG_iCal_Duration {
 	 * @param $duration string
 	 */
 	public function __construct( $duration ) {
-		if( $duration{0} == 'P' || (($duration{0} == '+' || $duration{0} == '-') && $duration{1} == 'P') ) {
+		
+		$ts = 0;
+		
+		if (preg_match('/[\\+\\-]{0,1}P((\d+)W)?((\d+)D)?(T)?((\d+)H)?((\d+)M)?((\d+)S)?/', $duration, $matches) === 1) {
+			$results = array(
+				'weeks'=>  (int)@ $matches[2],
+				'days'=>   (int)@ $matches[4],
+				'hours'=>  (int)@ $matches[7],
+				'minutes'=>(int)@ $matches[9],
+				'seconds'=>(int)@ $matches[11]
+			);
 			
-			if (preg_match('/P((\d+)W)?((\d+)D)?(T)?((\d+)H)?((\d+)M)?((\d+)S)?/', $duration, $matches) === 1) {
-				$results = array(
-					'weeks'=>  (int)  $matches[2],
-					'days'=>   (int)  $matches[4],
-					'hours'=>  (int)@ $matches[7],
-					'minutes'=>(int)@ $matches[9],
-					'seconds'=>(int)@ $matches[11]
-				); //7-9-11 are optional, so ignore warnings if not found with @
-			}
-			
-			$ts = 0;
 			$ts += $results['seconds'];
 			$ts += 60 * $results['minutes'];
 			$ts += 60 * 60 * $results['hours'];
 			$ts += 24 * 60 * 60 * $results['days'];
 			$ts += 7 * 24 * 60 * 60 * $results['weeks'];
-			
-			$dir = ($duration{0} == '-') ? -1 : 1;
-			
-			$this->dur = $dir * $ts;
 		} else {
 			// Invalid duration!
-			$this->dur = 0;
 		}
+		
+		$dir = ($duration{0} == '-') ? -1 : 1;
+		
+		$this->dur = $dir * $ts;
 	}
 	
 	/**

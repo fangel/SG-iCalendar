@@ -65,20 +65,31 @@ class SG_iCal_VTimeZone {
 	 * @return string standard|daylight
 	 */
 	private function getActive( $ts ) {
-		if( isset($this->cache[$ts]) ) {
+		
+		if (class_exists('DateTimeZone')) {
+			
+			//PHP >= 5.2
+			$tz = new DateTimeZone( $this->tzid );
+			$date = new DateTime("@$ts", $tz);
+			return ($date->format('%I') == 1) ? 'daylight' : 'standard';
+			
+		} else {
+			
+			if( isset($this->cache[$ts]) ) {
+				return $this->cache[$ts];
+			}
+			
+			$daylight_freq = new SG_iCal_Freq($this->daylight['rrule'], strtotime($this->daylight['dtstart']));
+			$standard_freq = new SG_iCal_Freq($this->standard['rrule'], strtotime($this->standard['dtstart']));
+			$last_standard = $standard_freq->previousOccurrence($ts);
+			$last_dst = $daylight_freq->previousOccurrence($ts);
+			if( $last_dst > $last_standard ) {
+				$this->cache[$ts] = 'daylight';
+			} else {
+				$this->cache[$ts] = 'standard';
+			}
+			
 			return $this->cache[$ts];
 		}
-		
-		$daylight_freq = new SG_iCal_Freq($this->daylight['rrule'], strtotime($this->daylight['dtstart']));
-		$standard_freq = new SG_iCal_Freq($this->standard['rrule'], strtotime($this->standard['dtstart']));
-		$last_standard = $standard_freq->previousOccurrence($ts);
-		$last_dst = $daylight_freq->previousOccurrence($ts);
-		if( $last_dst > $last_standard ) {
-			$this->cache[$ts] = 'daylight';
-		} else {
-			$this->cache[$ts] = 'standard';
-		}
-		
-		return $this->cache[$ts];
 	}
 }

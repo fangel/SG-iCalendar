@@ -71,7 +71,7 @@ class SG_iCal_VTimeZone {
 			//PHP >= 5.2
 			$tz = new DateTimeZone( $this->tzid );
 			$date = new DateTime("@$ts", $tz);
-			return ($date->format('%I') == 1) ? 'daylight' : 'standard';
+			return ($date->format('I') == 1) ? 'daylight' : 'standard';
 			
 		} else {
 			

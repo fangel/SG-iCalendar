@@ -21,12 +21,16 @@ class SG_iCal_Duration {
 	 */
 	public function __construct( $duration ) {
 		if( $duration{0} == 'P' || (($duration{0} == '+' || $duration{0} == '-') && $duration{1} == 'P') ) {
-			preg_match('/P((\d+)W)?((\d+)D)?(T)?((\d+)H)?((\d+)M)?((\d+)S)?/', $duration, $matches);
-			$results = @ array('weeks'=>(int)$matches[2],
-							'days'=>(int)$matches[4],
-							'hours'=>(int)$matches[7],
-							'minutes'=>(int)$matches[9],
-							'seconds'=>(int)$matches[11]);
+			
+			if (preg_match('/P((\d+)W)?((\d+)D)?(T)?((\d+)H)?((\d+)M)?((\d+)S)?/', $duration, $matches) === 1) {
+				$results = array(
+					'weeks'=>  (int)  $matches[2],
+					'days'=>   (int)  $matches[4],
+					'hours'=>  (int)@ $matches[7],
+					'minutes'=>(int)@ $matches[9],
+					'seconds'=>(int)@ $matches[11]
+				); //7-9-11 are optional, so ignore warnings if not found with @
+			}
 			
 			$ts = 0;
 			$ts += $results['seconds'];

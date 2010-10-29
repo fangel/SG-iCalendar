@@ -29,7 +29,7 @@ class SG_iCal_Query {
 		$rtn = array();
 		foreach( $ical AS $e ) {
 			if( ($start <= $e->getStart() && $e->getStart() < $end)
-			 || ($start < $e->getEnd() && $e->getEnd() <= $end) ) {
+			 || ($start < $e->getRangeEnd() && $e->getRangeEnd() <= $end) ) {
 				$rtn[] = $e;
 			}
 		}
@@ -53,7 +53,7 @@ class SG_iCal_Query {
 		
 		$rtn = array();
 		foreach( $ical AS $e ) {
-			if( $start <= $e->getStart() ) {
+			if($e->getStart() >= $start || $e->getRangeEnd() >= $start) {
 				$rtn[] = $e;
 			}
 		}

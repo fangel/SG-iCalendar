@@ -15,15 +15,18 @@
  */
 class SG_iCal_VEvent {
 	const DEFAULT_CONFIRMED = true;
+	
 	protected $uid;
 	protected $start;
 	protected $end;
+	protected $laststart;
 	protected $lastend;
-	protected $recurrence;
 	protected $summary;
 	protected $description;
 	protected $location;
-	protected $data;
+	
+	public $recurrence;
+	public $data;
 	
 	/**
 	 * Constructs a new SG_iCal_VEvent. Needs the SG_iCalReader 
@@ -31,7 +34,7 @@ class SG_iCal_VEvent {
 	 * @param SG_iCal_Line[] $data
 	 * @param SG_iCalReader $ical
 	 */
-	public function __construct($data, SG_iCal $ical ) {
+	public function __construct($data, SG_iCal $ical) {
 		$this->uid = $data['uid']->getData();
 		unset($data['uid']);
 
@@ -41,7 +44,7 @@ class SG_iCal_VEvent {
 		}
 		
 		if( isset($data['dtstart']) ) {
-			$this->start = $this->getTimestamp( $data['dtstart'], $ical );
+			$this->start = $this->getTimestamp($data['dtstart'], $ical);
 			unset($data['dtstart']);
 		}
 		
@@ -49,7 +52,6 @@ class SG_iCal_VEvent {
 			$this->end = $this->getTimestamp($data['dtend'], $ical);
 			unset($data['dtend']);
 		} elseif( isset($data['duration']) ) {
-			require_once dirname(__FILE__).'/../helpers/SG_iCal_Duration.php'; // BUILD: Remove line
 			$dur = new SG_iCal_Duration( $data['duration']->getData() );
 			$this->end = $this->start + $dur->getDuration();
 			unset($data['duration']);
@@ -64,7 +66,9 @@ class SG_iCal_VEvent {
 			if ( $this->recurrence->getUntil() or $this->recurrence->getCount() ) {
 				//if until is set, set that as the end date (using getTimeStamp)
 				if ( $until ) {
-					$this->lastend = strtotime( $until );
+					//date_default_timezone_set( xx );
+					$this->laststart = strtotime($until);
+					$this->lastend = $this->laststart + $this->getDuration();
 				}
 				//if count is set, then figure out the last occurrence and set that as the end date
 			}
@@ -147,6 +151,14 @@ class SG_iCal_VEvent {
 	 * @return int
 	 */
 	public function getEnd() {
+		return $this->end;
+	}
+
+	/**
+	 * Returns the timestamp for the end of the last event
+	 * @return int
+	 */
+	public function getRangeEnd() {
 		return max($this->end,$this->lastend);
 	}
 	
@@ -179,11 +191,27 @@ class SG_iCal_VEvent {
 	 * @return int
 	 */
 	private function getTimestamp( SG_iCal_Line $line, SG_iCal $ical ) {
-		$ts = strtotime($line->getData());
-		if( isset($line['tzid']) ) {
-			$tz = $ical->getTimeZoneInfo($line['tzid']);
-			$offset = $tz->getOffset($ts);
-			$ts = strtotime(date('D, d M Y H:i:s', $ts) . ' ' . $offset);
+		
+		if (class_exists('DateTimeZone')) {
+			
+			if( isset($line['tzid']) ) {
+				$tz = $ical->getTimeZoneInfo($line['tzid']);
+				$tz = new DateTimeZone( $tz->getTimeZoneId() );
+				$date = new DateTime($line->getData(),$tz);
+			} else {
+				$date = new DateTime($line->getData());
+			}
+			$ts = (int) $date->format('U');
+			
+		} else {
+			
+			//Warning in PHP 5.2 Strict
+			$ts = strtotime($line->getData());
+			if( isset($line['tzid']) ) {
+				$tz = $ical->getTimeZoneInfo($line['tzid']);
+				$offset = $tz->getOffset($ts);
+				$ts = strtotime(date('D, d M Y H:i:s', $ts) . ' ' . $offset);
+			}
 		}
 		return $ts;
 	}

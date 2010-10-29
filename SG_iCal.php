@@ -1,9 +1,10 @@
 <?php
 
-define('SG_ICALREADER_VERSION', '0.5.1.tpruvot');
+define('SG_ICALREADER_VERSION', '0.5.1-tpruvot');
 
 /**
  * A simple iCal parser. Should take care of most stuff for ya
+ * http://github.com/tpruvot/PHP-iCal
  *
  * Roadmap:
  *  * Finish FREQUENCY-parsing.
@@ -11,7 +12,7 @@ define('SG_ICALREADER_VERSION', '0.5.1.tpruvot');
  * 
  * A simple example:
  * <?php
- * $ical = new SG_iCal("http://example.com/calendar.ics");
+ * $ical = new SG_iCalReader("http://example.com/calendar.ics");
  * foreach( $ical->getEvents() As $event ) {
  *   // Do stuff with the event $event
  * }

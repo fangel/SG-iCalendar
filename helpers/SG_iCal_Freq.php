@@ -137,7 +137,7 @@ class SG_iCal_Freq {
 	 * @param int $offset
 	 * @return int
 	 */
-	public function findNext($offset) {		
+	public function findNext($offset) {
 		$echo = false;
 
 		//make sure the offset is valid

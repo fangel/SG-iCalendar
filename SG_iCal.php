@@ -34,6 +34,9 @@ class SG_iCal {
 		require_once dirname(__FILE__) . '/helpers/SG_iCal_Factory.php'; // BUILD: Remove line
 		require_once dirname(__FILE__) . '/helpers/SG_iCal_Line.php'; // BUILD: Remove line
 		require_once dirname(__FILE__) . '/helpers/SG_iCal_Query.php'; // BUILD: Remove line
+		require_once dirname(__FILE__) . '/helpers/SG_iCal_Recurrence.php'; // BUILD: Remove line
+		require_once dirname(__FILE__) . '/helpers/SG_iCal_Freq.php'; // BUILD: Remove line
+		require_once dirname(__FILE__) . '/helpers/SG_iCal_Duration.php'; // BUILD: Remove line
 		require_once dirname(__FILE__) . '/helpers/SG_iCal_Parser.php'; // BUILD: Remove line
 
 		if( $url !== false ) {

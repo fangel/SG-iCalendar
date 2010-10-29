@@ -23,9 +23,12 @@ define('SG_ICALREADER_VERSION', '0.5.1-tpruvot');
  * @license http://creativecommons.org/licenses/by-sa/2.5/dk/deed.en_GB CC-BY-SA-DK
  */
 class SG_iCal {
-	protected $information;
-	protected $events;
-	protected $timezones;
+
+	//objects
+	public $information; //SG_iCal_VCalendar
+	public $timezones;   //SG_iCal_VTimeZone
+	
+	protected $events; //SG_iCal_VEvent[]
 
 	/**
 	 * Constructs a new iCalReader. You can supply the url now, or later using setUrl
@@ -40,9 +43,7 @@ class SG_iCal {
 		require_once dirname(__FILE__) . '/helpers/SG_iCal_Query.php'; // BUILD: Remove line
 		require_once dirname(__FILE__) . '/helpers/SG_iCal_Factory.php'; // BUILD: Remove line
 
-		if( $url !== false ) {
-			SG_iCal_Parser::Parse($url, $this);
-		}
+		$this->setUrl($url);
 	}
 
 	/**

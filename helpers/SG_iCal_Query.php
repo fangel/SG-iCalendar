@@ -22,12 +22,12 @@ class SG_iCal_Query {
 		if( $ical instanceof SG_iCalReader ) {
 			$ical = $ical->getEvents();
 		}
-		if( !is_array($evs) ) {
+		if( !is_array($ical) ) {
 			throw new Exception('SG_iCal_Query::Between called with invalid input!');
 		}
 		
 		$rtn = array();
-		foreach( $evs AS $e ) {
+		foreach( $ical AS $e ) {
 			if( ($start <= $e->getStart() && $e->getStart() < $end)
 			 || ($start < $e->getEnd() && $e->getEnd() <= $end) ) {
 				$rtn[] = $e;

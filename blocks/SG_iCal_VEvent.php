@@ -63,7 +63,7 @@ class SG_iCal_VEvent {
 			$until = $this->recurrence->getUntil();
 			$count = $this->recurrence->getCount();
 			//check if there is either 'until' or 'count' set
-			if ( $this->recurrence->getUntil() or $this->recurrence->getCount() ) {
+			if ( $until or $count ) {
 				//if until is set, set that as the end date (using getTimeStamp)
 				if ( $until ) {
 					//date_default_timezone_set( xx );
@@ -71,8 +71,13 @@ class SG_iCal_VEvent {
 					$this->lastend = $this->laststart + $this->getDuration();
 				}
 				//if count is set, then figure out the last occurrence and set that as the end date
+			} else {
+				//forever... limit to 3 years
+				$this->recurrence->setUntil('+3 years');
+				$until = $this->recurrence->getUntil();
+				$this->laststart = strtotime($until);
+				$this->lastend = $this->laststart + $this->getDuration();
 			}
-			
 		}
 
 		$imports = array('summary','description','location');

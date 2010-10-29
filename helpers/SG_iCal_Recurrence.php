@@ -81,6 +81,18 @@ class SG_iCal_Recurrence {
 	}
 
 	/**
+	 * Set the $until member
+	 * @param mixed timestamp (int) / Valid DateTime format (string)
+	 */
+	public function setUntil($ts) {
+		if ( is_int($ts) )
+			$dt = new DateTime('@'.$ts);
+		else
+			$dt = new DateTime($ts);
+		$this->until = $dt->format('Ymd\THisO');
+	}
+
+	/**
 	 * Retrieves the desired member variable and returns it (if it's set)
 	 * @param string $member name of the member variable
 	 * @return mixed the variable value (if set), false otherwise
@@ -106,7 +118,6 @@ class SG_iCal_Recurrence {
 	 * @return mixed string if the member has been set, false otherwise
 	 */
 	public function getUntil() {
-
 		return $this->getMember('until');
 	}
 

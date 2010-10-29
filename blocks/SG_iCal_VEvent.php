@@ -15,15 +15,15 @@
  */
 class SG_iCal_VEvent {
 	const DEFAULT_CONFIRMED = true;
-	private $uid;
-	private $start;
-	private $end;
-	private $lastend;
-	private $recurrence;
-	private $summary;
-	private $description;
-	private $location;
-	private $data;
+	protected $uid;
+	protected $start;
+	protected $end;
+	protected $lastend;
+	protected $recurrence;
+	protected $summary;
+	protected $description;
+	protected $location;
+	protected $data;
 	
 	/**
 	 * Constructs a new SG_iCal_VEvent. Needs the SG_iCalReader 

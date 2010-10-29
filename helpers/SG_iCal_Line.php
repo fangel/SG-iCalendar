@@ -15,11 +15,11 @@
  * @license http://creativecommons.org/licenses/by-sa/2.5/dk/deed.en_GB CC-BY-SA-DK
  */
 class SG_iCal_Line implements ArrayAccess, Countable, IteratorAggregate {
-	private $ident;
-	private $data;
-	private $params = array();
+	protected $ident;
+	protected $data;
+	protected $params = array();
 	
-	private $replacements = array('from'=>array('\\,', '\\n', '\\;', '\\:', '\\"'), 'to'=>array(',', "\n", ';', ':', '"'));
+	protected $replacements = array('from'=>array('\\,', '\\n', '\\;', '\\:', '\\"'), 'to'=>array(',', "\n", ';', ':', '"'));
 	
 	/**
 	 * Constructs a new line.

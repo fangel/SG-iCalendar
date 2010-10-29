@@ -10,7 +10,7 @@
  * @license http://creativecommons.org/licenses/by-sa/2.5/dk/deed.en_GB CC-BY-SA-DK
  */
 class SG_iCal_VCalendar implements IteratorAggregate {
-	private $data;
+	protected $data;
 	
 	/**
 	 * Creates a new SG_iCal_VCalendar.

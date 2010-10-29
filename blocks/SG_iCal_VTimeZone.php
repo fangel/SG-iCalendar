@@ -9,10 +9,10 @@
  * @license http://creativecommons.org/licenses/by-sa/2.5/dk/deed.en_GB CC-BY-SA-DK
  */
 class SG_iCal_VTimeZone {
-	private $tzid;
-	private $daylight;
-	private $standard;
-	private $cache = array();
+	protected $tzid;
+	protected $daylight;
+	protected $standard;
+	protected $cache = array();
 	
 	/**
 	 * Constructs a new SG_iCal_VTimeZone

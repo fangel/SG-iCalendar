@@ -23,13 +23,13 @@
  * @license http://creativecommons.org/licenses/by-sa/2.5/dk/deed.en_GB CC-BY-SA-DK
  */
 class SG_iCal_Freq {
-	private $weekdays = array('MO'=>'monday', 'TU'=>'tuesday', 'WE'=>'wednesday', 'TH'=>'thursday', 'FR'=>'friday', 'SA'=>'saturday', 'SU'=>'sunday');
-	private $knownRules = array('month', 'weekno', 'day', 'monthday', 'yearday', 'hour', 'minute');
-	private $simpleMode = true;
+	protected $weekdays = array('MO'=>'monday', 'TU'=>'tuesday', 'WE'=>'wednesday', 'TH'=>'thursday', 'FR'=>'friday', 'SA'=>'saturday', 'SU'=>'sunday');
+	protected $knownRules = array('month', 'weekno', 'day', 'monthday', 'yearday', 'hour', 'minute');
+	protected $simpleMode = true;
 	
-	private $rules = array('freq'=>'yearly', 'interval'=>1);
-	private $start = 0;
-	private $freq = '';
+	protected $rules = array('freq'=>'yearly', 'interval'=>1);
+	protected $start = 0;
+	protected $freq = '';
 	
 	/**
 	 * Constructs a new Freqency-rule

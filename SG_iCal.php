@@ -1,6 +1,6 @@
 <?php
 
-define('SG_ICALREADER_VERSION', '0.5');
+define('SG_ICALREADER_VERSION', '0.5.1.tpruvot');
 
 /**
  * A simple iCal parser. Should take care of most stuff for ya
@@ -22,9 +22,9 @@ define('SG_ICALREADER_VERSION', '0.5');
  * @license http://creativecommons.org/licenses/by-sa/2.5/dk/deed.en_GB CC-BY-SA-DK
  */
 class SG_iCal {
-	private $information;
-	private $events;
-	private $timezones;
+	protected $information;
+	protected $events;
+	protected $timezones;
 
 	/**
 	 * Constructs a new iCalReader. You can supply the url now, or later using setUrl

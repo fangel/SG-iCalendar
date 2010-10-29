@@ -9,7 +9,7 @@
  */
 
 class SG_iCal_Duration {
-	private $dur;
+	protected $dur;
 	
 	/**
 	 * Constructs a new SG_iCal_Duration from a duration-rule.

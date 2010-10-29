@@ -1,6 +1,6 @@
 <?php
 
-define('SG_ICALREADER_VERSION', '0.5.1-tpruvot');
+define('SG_ICALREADER_VERSION', '0.6.0-tpruvot');
 
 /**
  * A simple iCal parser. Should take care of most stuff for ya

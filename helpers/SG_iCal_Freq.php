@@ -24,7 +24,8 @@
  */
 class SG_iCal_Freq {
 	protected $weekdays = array('MO'=>'monday', 'TU'=>'tuesday', 'WE'=>'wednesday', 'TH'=>'thursday', 'FR'=>'friday', 'SA'=>'saturday', 'SU'=>'sunday');
-	protected $knownRules = array('month', 'weekno', 'day', 'monthday', 'yearday', 'hour', 'minute');
+	protected $knownRules = array('month', 'weekno', 'day', 'monthday', 'yearday', 'hour', 'minute'); //others : 'setpos', 'second'
+	protected $ruleModifiers = array('wkst');
 	protected $simpleMode = true;
 	
 	protected $rules = array('freq'=>'yearly', 'interval'=>1);
@@ -97,7 +98,7 @@ class SG_iCal_Freq {
 	 * @return int
 	 */
 	public function nextOccurrence( $offset ) {
-		//return $this->findNext( $this->previousOccurrence( $offset) );
+		$start = ($offset > $this->start) ? $offset : $this->start;
 		return $this->findNext($offset);
 	}
 

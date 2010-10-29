@@ -116,6 +116,6 @@ class VEventTest extends PHPUnit_Framework_TestCase {
 
 		date_default_timezone_set('America/New_York');
 		$event = new SG_iCal_VEvent($data, $ical);
-		$this->assertEquals(strtotime('20091030T090000'), $event->getEnd());
+		$this->assertEquals(strtotime('20091030T090000'), $event->getProperty('laststart'));
 	}
 }

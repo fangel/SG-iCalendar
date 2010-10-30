@@ -31,8 +31,9 @@ class SG_iCal_Freq {
 	protected $rules = array('freq'=>'yearly', 'interval'=>1);
 	protected $start = 0;
 	protected $freq = '';
-	protected $excluded;
-	
+
+	protected $excluded; //EXDATE
+
 	public $cache;
 
 	/**
@@ -69,13 +70,16 @@ class SG_iCal_Freq {
 			}
 		}
 		
-		//set until
+		//set until, and cache
 		if( isset($this->rules['count']) ) {
-			$ts = $this->firstOccurrence();
-			for($i=1; $i<$this->rules['count']; $i++) {
+			$ts = $this->start;
+			$cache[0] = $ts;
+			for($n=1; $n < $this->rules['count']; $n++) {
 				$ts = $this->findNext($ts);
+				$cache[$n] = $ts;
 			}
 			$this->rules['until'] = $ts;
+			$this->cache = $cache;
 		}
 	}
 
@@ -87,14 +91,13 @@ class SG_iCal_Freq {
 	public function getAllOccurrences() {
 		if (empty($this->cache)) {
 			//build cache
-			unset($this->cache);
-			$this->cache[] = $this->start;
+			$n=0; $cache[$n] = $this->start;
 			$next = $this->findNext($this->start);
 			while ($next) {
-				//if (!in_array($next, $this->excluded))
-					$this->cache[] = $next;
+				$n++; $cache[$n] = $next;
 				$next = $this->findNext($next);
 			}
+			$this->cache = $cache;
 		}
 		return $this->cache;
 	}
@@ -146,18 +149,14 @@ class SG_iCal_Freq {
 
 	/**
 	 * Finds the absolute last occurrence of the rule from the given offset.
+	 * Builds also the cache, if not set before...
 	 * @return int timestamp
 	 */
 	public function lastOccurrence() {
-		if (!empty($this->cache)) {
-			return end($this->cache);
-		}
-		$ts = $next = $this->findNext($this->start);
-		while ($next) {
-			$ts = $next;
-			$next = $this->findNext($ts);
-		}
-		return $ts;
+		//build cache if not done
+		$this->getAllOccurrences();
+		//return last timestamp in cache
+		return end($this->cache);
 	}
 
 	/**
@@ -211,14 +210,16 @@ class SG_iCal_Freq {
 
 		if( $this->simpleMode ) {
 			if( $offset < $t ) {
-				return $t;
+				$ts = $t;
+				if ($ts && in_array($ts, $this->excluded))
+					$ts = $this->findNext($ts);
 			} else {
-				$next = $this->findStartingPoint( $t, $this->rules['interval'], false );
-				if( !$this->validDate( $next ) ) {
-					return $this->findNext($next);
+				$ts = $this->findStartingPoint( $t, $this->rules['interval'], false );
+				if( !$this->validDate( $ts ) ) {
+					$ts = $this->findNext($ts);
 				}
 			}
-			return $next;
+			return $ts;
 		}
 
 		$eop = $this->findEndOfPeriod($offset);

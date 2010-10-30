@@ -80,6 +80,24 @@ class SG_iCal_Freq {
 		}
 	}
 
+	
+	/**
+	 * Returns all timestamps array(), build the cache if not made before
+	 * @return array
+	 */
+	public function getAllOccurrences() {
+		if (empty($this->cache)) {
+			//build cache
+			$i=0; $this->cache[0] = $this->start;
+			$next = $this->findNext($this->start);
+			while ($next) {
+				$i++; $this->cache[$i] = $next;
+				$next = $this->findNext($next);
+			}
+		}
+		return $this->cache;
+	}
+
 	/**
 	 * Returns the previous (most recent) occurrence of the rule from the
 	 * given offset
@@ -88,12 +106,11 @@ class SG_iCal_Freq {
 	 */
 	public function previousOccurrence( $offset ) {
 		if (!empty($this->cache)) {
-			reset($this->cache);
-			while( ($t2 = next($this->cache)) < $offset) {
-				if( $t2 == false ){
-					break;
-				}
-				$ts = $t2;
+			$t2=$this->cache[0];
+			foreach($this->cache as $ts) {
+				if ($ts >= $offset)
+					return $t2;
+				$t2 = $ts;
 			}
 		} else {
 			$ts = $this->start;
@@ -168,6 +185,14 @@ class SG_iCal_Freq {
 	 * @return int
 	 */
 	public function findNext($offset) {
+		
+		if (!empty($this->cache)) {
+			foreach($this->cache as $ts) {
+				if ($ts > $offset)
+					return $ts;
+			}
+		}
+		
 		$debug = false;
 
 		//make sure the offset is valid

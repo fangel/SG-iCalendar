@@ -67,11 +67,11 @@ class SG_iCal_Freq {
 		}
 
 		if( isset($this->rules['count']) ) {
-			$n = $start;
-			for($i=0;$i<$this->rules['count']-1;$i++) {
-				$n = $this->findNext($n);
+			$ts = $this->firstOccurrence();
+			for($i=1; $i<$this->rules['count']; $i++) {
+				$ts = $this->findNext($ts);
 			}
-			$this->rules['until'] = $n;
+			$this->rules['until'] = $ts;
 		}
 	}
 
@@ -98,8 +98,17 @@ class SG_iCal_Freq {
 	 * @return int
 	 */
 	public function nextOccurrence( $offset ) {
-		$start = ($offset > $this->start) ? $offset : $this->start;
-		return $this->findNext($start);
+		if ($offset < $this->start)
+			return $this->firstOccurrence();
+		return $this->findNext($offset);
+	}
+
+	/**
+	 * Finds the first occurrence of the rule.
+	 * @return int timestamp
+	 */
+	public function firstOccurrence() {
+		return $this->start;
 	}
 
 	/**
@@ -107,11 +116,12 @@ class SG_iCal_Freq {
 	 * @return int timestamp
 	 */
 	public function lastOccurrence() {
-		$next = $this->findNext($this->start);
+		$ts = $next = $this->findNext($this->start);
 		while ($next) {
-			$next = $this->findNext($next);
+			$ts = $next;
+			$next = $this->findNext($ts);
 		}
-		return $next;
+		return $ts;
 	}
 
 	/**

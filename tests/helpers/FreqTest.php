@@ -605,13 +605,25 @@ class FreqTest extends PHPUnit_Framework_TestCase {
 		}
 	}
 
-	public function testLastOccurrence() {
+
+	//weird : in this test $start is not an occurrence !
+	/*
+	public function testFirstOccurrenceByYearDay() {
 		$rule = 'FREQ=YEARLY;INTERVAL=2;BYYEARDAY=1;COUNT=5';
 		$start = strtotime('2009-10-27T090000');
 		$freq = new SG_iCal_Freq($rule, $start);
-		$this->assertEquals(strtotime('2018-01-01T09:00:00'), $freq->lastOccurrence());
+		$this->assertEquals(strtotime('2011-01-01T09:00:00'), $freq->firstOccurrence());
 	}
+	*/
 	
+	public function testLastOccurrenceByYearDay() {
+		$rule = 'FREQ=YEARLY;INTERVAL=2;BYYEARDAY=1;COUNT=5';
+		$start = strtotime('2011-01-01T090000');
+		$freq = new SG_iCal_Freq($rule, $start);
+		$this->assertEquals(strtotime('2019-01-01T09:00:00'), $freq->lastOccurrence());
+	}
+
+
 	// TODO: WKST rule
 	
 	private function assertRule( $rule, $start, $dateset ) {
@@ -620,6 +632,7 @@ class FreqTest extends PHPUnit_Framework_TestCase {
 		$n = $start - 1;
 		do {
 			$n = $freq->findNext($n);
+			//echo date('Y-m-d H:i:sO ',$n);
 			$e = (current($dateset) != -1) ? current($dateset) : false;
 			$this->assertEquals($e, $n);
 		} while( next($dateset) !== false );

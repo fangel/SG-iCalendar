@@ -57,27 +57,26 @@ class SG_iCal_VEvent {
 			unset($data['duration']);
 		}
 		
-		//google cal set dtend as end of initial event
+		//google cal set dtend as end of initial event (duration)
 		if ( isset($this->recurrence) ) {
 			//if there is a recurrence rule
 			$until = $this->recurrence->getUntil();
 			$count = $this->recurrence->getCount();
 			//check if there is either 'until' or 'count' set
-			if ( $until or $count ) {
-				//if until is set, set that as the end date (using getTimeStamp)
-				if ( $until ) {
-					//date_default_timezone_set( xx );
-					$this->laststart = strtotime($until);
-					$this->lastend = $this->laststart + $this->getDuration();
-				}
+			if ( $until ) {
+				//ok..
+			} elseif ($count) {
 				//if count is set, then figure out the last occurrence and set that as the end date
+				$freq = new SG_iCal_Freq($this->recurrence->rrule, $start);
+				$until = $freq->lastOccurrence($this->start);
 			} else {
 				//forever... limit to 3 years
 				$this->recurrence->setUntil('+3 years');
 				$until = $this->recurrence->getUntil();
-				$this->laststart = strtotime($until);
-				$this->lastend = $this->laststart + $this->getDuration();
 			}
+			//date_default_timezone_set( xx ) needed ?;
+			$this->laststart = strtotime($until);
+			$this->lastend = $this->laststart + $this->getDuration();
 		}
 
 		$imports = array('summary','description','location');

@@ -88,6 +88,10 @@ class SG_iCal_VEvent {
 			}
 		}
 		
+		if( isset($this->previous_tz) ) {
+			date_default_timezone_set($this->previous_tz);
+		}
+		
 		$this->data = SG_iCal_Line::Remove_Line($data);
 	}
 	
@@ -190,34 +194,39 @@ class SG_iCal_VEvent {
 		}
 	}
 	
+	
+	
+	/**
+	 * Set default timezone (temporary) to get timestamps
+	 * @return string
+	 */
+	protected function setLineTimeZone(SG_iCal_Line $line) {
+		if( isset($line['tzid']) ) {
+			if (!isset($this->previous_tz)) {
+				$this->previous_tz = @ date_default_timezone_get();
+			}
+			$this->tzid = $line['tzid'];
+			date_default_timezone_set($this->tzid);
+			return true;
+		}
+		return false;
+	}
+	
 	/**
 	 * Calculates the timestamp from a DT line.
 	 * @param $line SG_iCal_Line
 	 * @return int
 	 */
-	private function getTimestamp( SG_iCal_Line $line, SG_iCal $ical ) {
+	protected function getTimestamp( SG_iCal_Line $line, SG_iCal $ical ) {
 		
-		if (class_exists('DateTimeZone')) {
-			
-			if( isset($line['tzid']) ) {
-				$tz = $ical->getTimeZoneInfo($line['tzid']);
-				$tz = new DateTimeZone( $tz->getTimeZoneId() );
-				$date = new DateTime($line->getData(),$tz);
-			} else {
-				$date = new DateTime($line->getData());
-			}
-			$ts = (int) $date->format('U');
-			
-		} else {
-			
-			//Warning in PHP 5.2 Strict
-			$ts = strtotime($line->getData());
-			if( isset($line['tzid']) ) {
-				$tz = $ical->getTimeZoneInfo($line['tzid']);
-				$offset = $tz->getOffset($ts);
-				$ts = strtotime(date('D, d M Y H:i:s', $ts) . ' ' . $offset);
-			}
+		if( isset($line['tzid']) ) {
+			$this->setLineTimeZone($line);
+			//$tz = $ical->getTimeZoneInfo($line['tzid']);
+			//$offset = $tz->getOffset($ts);
+			//$ts = strtotime(date('D, d M Y H:i:s', $ts) . ' ' . $offset);
 		}
+		$ts = strtotime($line->getData());
+
 		return $ts;
 	}
 }

@@ -605,21 +605,28 @@ class FreqTest extends PHPUnit_Framework_TestCase {
 		}
 	}
 
-
-	//weird : in this test $start is not an occurrence !
-	/*
-	public function testFirstOccurrenceByYearDay() {
+	//weird : in this test $start is not a matched occurrence but...
+	public function testFirstOccurrencesByYearDay() {
 		$rule = 'FREQ=YEARLY;INTERVAL=2;BYYEARDAY=1;COUNT=5';
 		$start = strtotime('2009-10-27T090000');
 		$freq = new SG_iCal_Freq($rule, $start);
-		$this->assertEquals(strtotime('2011-01-01T09:00:00'), $freq->firstOccurrence());
+		$this->assertEquals(strtotime('2009-10-27T09:00:00'), $freq->firstOccurrence());
+		$this->assertEquals(strtotime('2011-01-01T09:00:00'), $freq->nextOccurrence($start));
 	}
-	*/
 	
 	public function testLastOccurrenceByYearDay() {
 		$rule = 'FREQ=YEARLY;INTERVAL=2;BYYEARDAY=1;COUNT=5';
 		$start = strtotime('2011-01-01T090000');
 		$freq = new SG_iCal_Freq($rule, $start);
+		$this->assertEquals(strtotime('2019-01-01T09:00:00'), $freq->lastOccurrence());
+	}
+
+	public function testCacheCount() {
+		$rule = 'FREQ=YEARLY;INTERVAL=2;BYYEARDAY=1;COUNT=5';
+		$start = strtotime('2011-01-01T090000');
+		$freq = new SG_iCal_Freq($rule, $start);
+		$this->assertEquals(5, count($freq->getAllOccurrences()));
+		$this->assertEquals(5, count($freq->getAllOccurrences()));
 		$this->assertEquals(strtotime('2019-01-01T09:00:00'), $freq->lastOccurrence());
 	}
 

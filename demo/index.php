@@ -17,14 +17,14 @@ $evts = $query->Between($ical,strtotime('20100901'),strtotime('20101131'));
 
 $data = array();
 foreach($evts as $id => $ev) {
-	
 	$jsEvt = array(
 		"id" => ($id+1),
 		"title" => $ev->getProperty('summary'),
 		"start" => $ev->getStart(),
-		"end"   => $ev->getEnd(),
-		"allDay" => false
+		"end"   => $ev->getEnd()-1,
+		"allDay" => $ev->isWholeDay()
 	);
+
 	$data[] = $jsEvt;
 	
 	if (isset($ev->recurrence)) {
@@ -36,13 +36,15 @@ foreach($evts as $id => $ev) {
 			$count++;
 			$start = $next;
 			$jsEvt["start"] = $start;
-			$jsEvt["end"] = $start + $ev->getDuration();
+			$jsEvt["end"] = $start + $ev->getDuration()-1;
+			
 			$data[] = $jsEvt;
 		}
 	}
 	
 }
-
+//echo(date('Ymd\n',$data[0][start]));
+//echo(date('Ymd\n',$data[1][start]));
 //dump_t($data);
 
 $events = "events:".json_encode($data).',';

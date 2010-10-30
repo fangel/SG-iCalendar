@@ -180,6 +180,18 @@ class SG_iCal_VEvent {
 	}
 	
 	/**
+	 * Returns true if duration is multiple of 86400
+	 * @return bool
+	 */
+	public function isWholeDay() {
+		$dur = $this->getDuration();
+		if ($dur > 0 && ($dur % 86400) == 0) {
+			return true;
+		}
+		return false;
+	}
+	
+	/**
 	 * Returns the given property of the event.
 	 * @param string $prop
 	 * @return string

@@ -1,0 +1,17 @@
+About this fork (forked at v0.5.0 from http://github.com/fangel/SG-iCalendar)
+
+Changelog :
+
+0.7.0-tpr (30 oct 2010)
+ + ical EXDATE support (excluded dates in a range)
+ + $event->isWholeDay()
+ + getAllOccurrences() for repeated events
+ + implemented a cache for repeated events
+
+0.6.0-tpr (29 oct 2010)
+ + Added demo based on fullcalendar
+ + Added duration unit tests
+ + Support of Recurrent events in query Between()
+ * various fixes on actual (5) issues
+
+Fixed 

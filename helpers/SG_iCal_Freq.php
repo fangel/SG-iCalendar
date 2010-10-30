@@ -68,7 +68,7 @@ class SG_iCal_Freq {
 
 		if( isset($this->rules['count']) ) {
 			$n = $start;
-			for($i=0;$i<$this->rules['count'];$i++) {
+			for($i=0;$i<$this->rules['count']-1;$i++) {
 				$n = $this->findNext($n);
 			}
 			$this->rules['until'] = $n;
@@ -99,7 +99,7 @@ class SG_iCal_Freq {
 	 */
 	public function nextOccurrence( $offset ) {
 		$start = ($offset > $this->start) ? $offset : $this->start;
-		return $this->findNext($offset);
+		return $this->findNext($start);
 	}
 
 	/**
@@ -107,13 +107,11 @@ class SG_iCal_Freq {
 	 * @return int timestamp
 	 */
 	public function lastOccurrence() {
-		$temp_timestamp = $this->findNext($this->start);
-		$timestamp = 0;
-		while ($temp_timestamp) {
-			$timestamp = $temp_timestamp;
-			$temp_timestamp = $this->findNext($temp_timestamp);
+		$next = $this->findNext($this->start);
+		while ($next) {
+			$next = $this->findNext($next);
 		}
-		return $timestamp;
+		return $next;
 	}
 	
 	/**
@@ -143,7 +141,7 @@ class SG_iCal_Freq {
 		$echo = false;
 
 		//make sure the offset is valid
-		if( $offset === false || (isset($this->rules['until']) && $this->rules['until'] <= $offset) ) {
+		if( $offset === false || (isset($this->rules['until']) && $offset > $this->rules['until']) ) {
 			if($echo) echo 'STOP: ' . date('r', $offset) . "\n";
 			return false;
 		}
@@ -196,7 +194,7 @@ class SG_iCal_Freq {
 			}
 		}
 
-		if( $this->start > $offset && $this->start < $t ) {
+		if( $offset < $this->start && $this->start < $t ) {
 			return $this->start;
 		} else if( $found && ($t != $offset)) {
 			if( $this->validDate( $t ) ) {
@@ -398,7 +396,7 @@ class SG_iCal_Freq {
 	}
 	
 	private function validDate( $t ) {
-		if( isset($this->rules['until']) && $this->rules['until'] <= $t ) {
+		if( isset($this->rules['until']) && $t > $this->rules['until'] ) {
 			return false;
 		}
 		

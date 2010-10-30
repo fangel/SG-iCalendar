@@ -15,7 +15,7 @@
  */
 class SG_iCal_VEvent {
 	const DEFAULT_CONFIRMED = true;
-	
+
 	protected $uid;
 	protected $start;
 	protected $end;
@@ -24,10 +24,12 @@ class SG_iCal_VEvent {
 	protected $summary;
 	protected $description;
 	protected $location;
-	
+
 	public $recurrence;
+	public $freq; //getFrequency()
+
 	public $data;
-	
+
 	/**
 	 * Constructs a new SG_iCal_VEvent. Needs the SG_iCalReader 
 	 * supplied so it can query for timezones.
@@ -35,6 +37,7 @@ class SG_iCal_VEvent {
 	 * @param SG_iCalReader $ical
 	 */
 	public function __construct($data, SG_iCal $ical) {
+		
 		$this->uid = $data['uid']->getData();
 		unset($data['uid']);
 
@@ -42,7 +45,7 @@ class SG_iCal_VEvent {
 			$this->recurrence = new SG_iCal_Recurrence($data['rrule']);
 			unset($data['rrule']);
 		}
-		
+
 		if( isset($data['dtstart']) ) {
 			$this->start = $this->getTimestamp($data['dtstart'], $ical);
 			unset($data['dtstart']);
@@ -67,8 +70,8 @@ class SG_iCal_VEvent {
 				//ok..
 			} elseif ($count) {
 				//if count is set, then figure out the last occurrence and set that as the end date
-				$freq = new SG_iCal_Freq($this->recurrence->rrule, $start);
-				$until = $freq->lastOccurrence($this->start);
+				$this->freq = new SG_iCal_Freq($this->recurrence->rrule, $start);
+				$until = $this->freq->lastOccurrence($this->start);
 			} else {
 				//forever... limit to 3 years
 				$this->recurrence->setUntil('+3 years');
@@ -92,6 +95,20 @@ class SG_iCal_VEvent {
 		}
 		
 		$this->data = SG_iCal_Line::Remove_Line($data);
+	}
+	
+	
+	/**
+	 * Returns the Event Occurrences Iterator (if recurrence set)
+	 * @return SG_iCal_Freq
+	 */
+	public function getFrequency() {
+		if (! isset($this->freq)) {
+			if ( isset($this->recurrence) ) {
+				$this->freq = new SG_iCal_Freq($this->recurrence->rrule, $this->start);
+			}
+		}
+		return $this->freq;
 	}
 	
 	/**

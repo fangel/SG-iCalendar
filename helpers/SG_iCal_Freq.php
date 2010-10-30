@@ -31,11 +31,13 @@ class SG_iCal_Freq {
 	protected $rules = array('freq'=>'yearly', 'interval'=>1);
 	protected $start = 0;
 	protected $freq = '';
+	
+	public $cache;
 
 	/**
 	 * Constructs a new Freqency-rule
 	 * @param $rule string
-	 * @param $start int Unix-timestamp (important!)
+	 * @param $start int Unix-timestamp (important : Need to be the start of Event)
 	 */
 	public function __construct( $rule, $start ) {
 		$this->start = $start;
@@ -65,11 +67,14 @@ class SG_iCal_Freq {
 				$this->rules['bymonthday'] = date('d', $this->start);
 			}
 		}
-
+		
+		//set until, and cache
 		if( isset($this->rules['count']) ) {
 			$ts = $this->firstOccurrence();
+			$this->cache[0] = $ts;
 			for($i=1; $i<$this->rules['count']; $i++) {
 				$ts = $this->findNext($ts);
+				$this->cache[$i] = $ts;
 			}
 			$this->rules['until'] = $ts;
 		}
@@ -82,14 +87,24 @@ class SG_iCal_Freq {
 	 * @return int
 	 */
 	public function previousOccurrence( $offset ) {
-		$t1 = $this->start;
-		while( ($t2 = $this->findNext($t1)) < $offset) {
-			if( $t2 == false ){
-				break;
+		if (!empty($this->cache)) {
+			reset($this->cache);
+			while( ($t2 = next($this->cache)) < $offset) {
+				if( $t2 == false ){
+					break;
+				}
+				$ts = $t2;
 			}
-			$t1 = $t2;
+		} else {
+			$ts = $this->start;
+			while( ($t2 = $this->findNext($ts)) < $offset) {
+				if( $t2 == false ){
+					break;
+				}
+				$ts = $t2;
+			}
 		}
-		return $t1;
+		return $ts;
 	}
 
 	/**
@@ -116,9 +131,14 @@ class SG_iCal_Freq {
 	 * @return int timestamp
 	 */
 	public function lastOccurrence() {
+		if (!empty($this->cache)) {
+			return end($this->cache);
+		}
+		$i=0; $this->cache[0] = $this->start;
 		$ts = $next = $this->findNext($this->start);
 		while ($next) {
 			$ts = $next;
+			$i++; $this->cache[$i] = $ts;
 			$next = $this->findNext($ts);
 		}
 		return $ts;

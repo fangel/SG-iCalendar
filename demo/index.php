@@ -11,8 +11,8 @@ $ICS = "basic.ics";
 $ical = new SG_iCalReader($ICS);
 $query = new SG_iCal_Query();
 
-//$evts = $ical->getEvents();
-$evts = $query->Between($ical,strtotime('20100901'),strtotime('20101131'));
+$evts = $ical->getEvents();
+//$evts = $query->Between($ical,strtotime('20100901'),strtotime('20101131'));
 
 
 $data = array();
@@ -30,7 +30,8 @@ foreach($evts as $id => $ev) {
 	if (isset($ev->recurrence)) {
 		$count = 1;
 		$start = $ev->getStart();
-		$freq = new SG_iCal_Freq($ev->recurrence->rrule, $start);
+		//$freq = new SG_iCal_Freq($ev->recurrence->rrule, $start);
+		$freq = $ev->getFrequency();
 		while (($next = $freq->nextOccurrence($start)) > 0 ) {
 			if (!$next or $count >= 200) break;
 			$count++;

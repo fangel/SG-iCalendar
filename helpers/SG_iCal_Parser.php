@@ -119,8 +119,13 @@ class SG_iCal_Parser {
 					if( array_search($s, $sections) !== false ) {
 						// This section is in the main section
 						if( $section == $s ) {
-							// It _is_ the main section
-							$current_data[$s][$line->getIdent()] = $line; 
+							// It _is_ the main section else
+							if ($line->getIdent() != "exdate")
+								$current_data[$s][$line->getIdent()] = $line; 
+							else {
+								//exdate could appears more that once
+								$current_data[$s][$line->getIdent()][] = $line;
+							}
 						} else {
 							// Sub section
 							$current_data[$s][$section][$line->getIdent()] = $line; 

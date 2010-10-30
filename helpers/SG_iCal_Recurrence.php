@@ -42,7 +42,6 @@ class SG_iCal_Recurrence {
 		'byyearday', 'byyearno', 'bymonth', 'bysetpos'
 	);
 
-
 	/**
 	 * Creates an recurrence object with a passed in line.  Parses the line.
 	 * @param object $line an SG_iCal_Line object which will be parsed to get the

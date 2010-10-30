@@ -31,6 +31,7 @@ class SG_iCal_Freq {
 	protected $rules = array('freq'=>'yearly', 'interval'=>1);
 	protected $start = 0;
 	protected $freq = '';
+	protected $excluded;
 	
 	public $cache;
 
@@ -39,8 +40,9 @@ class SG_iCal_Freq {
 	 * @param $rule string
 	 * @param $start int Unix-timestamp (important : Need to be the start of Event)
 	 */
-	public function __construct( $rule, $start ) {
+	public function __construct( $rule, $start, $excluded=array()) {
 		$this->start = $start;
+		$this->excluded = $excluded;
 
 		$rules = array();
 		foreach( explode(';', $rule) AS $v) {
@@ -52,7 +54,6 @@ class SG_iCal_Freq {
 			$this->rules['until'] = strtotime($this->rules['until']);
 		}
 		$this->freq = strtolower($this->rules['freq']);
-
 
 		foreach( $this->knownRules AS $rule ) {
 			if( isset($this->rules['by' . $rule]) ) {
@@ -68,13 +69,11 @@ class SG_iCal_Freq {
 			}
 		}
 		
-		//set until, and cache
+		//set until
 		if( isset($this->rules['count']) ) {
 			$ts = $this->firstOccurrence();
-			$this->cache[0] = $ts;
 			for($i=1; $i<$this->rules['count']; $i++) {
 				$ts = $this->findNext($ts);
-				$this->cache[$i] = $ts;
 			}
 			$this->rules['until'] = $ts;
 		}
@@ -88,10 +87,12 @@ class SG_iCal_Freq {
 	public function getAllOccurrences() {
 		if (empty($this->cache)) {
 			//build cache
-			$i=0; $this->cache[0] = $this->start;
+			unset($this->cache);
+			$this->cache[] = $this->start;
 			$next = $this->findNext($this->start);
 			while ($next) {
-				$i++; $this->cache[$i] = $next;
+				//if (!in_array($next, $this->excluded))
+					$this->cache[] = $next;
 				$next = $this->findNext($next);
 			}
 		}
@@ -106,7 +107,7 @@ class SG_iCal_Freq {
 	 */
 	public function previousOccurrence( $offset ) {
 		if (!empty($this->cache)) {
-			$t2=$this->cache[0];
+			$t2=$this->start;
 			foreach($this->cache as $ts) {
 				if ($ts >= $offset)
 					return $t2;
@@ -151,11 +152,9 @@ class SG_iCal_Freq {
 		if (!empty($this->cache)) {
 			return end($this->cache);
 		}
-		$i=0; $this->cache[0] = $this->start;
 		$ts = $next = $this->findNext($this->start);
 		while ($next) {
 			$ts = $next;
-			$i++; $this->cache[$i] = $ts;
 			$next = $this->findNext($ts);
 		}
 		return $ts;
@@ -185,7 +184,6 @@ class SG_iCal_Freq {
 	 * @return int
 	 */
 	public function findNext($offset) {
-		
 		if (!empty($this->cache)) {
 			foreach($this->cache as $ts) {
 				if ($ts > $offset)
@@ -214,10 +212,11 @@ class SG_iCal_Freq {
 		if( $this->simpleMode ) {
 			if( $offset < $t ) {
 				return $t;
-			}
-			$next = $this->findStartingPoint( $t, $this->rules['interval'], false );
-			if( !$this->validDate( $next ) ) {
-				return $this->findNext($next);
+			} else {
+				$next = $this->findStartingPoint( $t, $this->rules['interval'], false );
+				if( !$this->validDate( $next ) ) {
+					return $this->findNext($next);
+				}
 			}
 			return $next;
 		}
@@ -250,19 +249,23 @@ class SG_iCal_Freq {
 		}
 
 		if( $offset < $this->start && $this->start < $t ) {
-			return $this->start;
+			$ts = $this->start;
 		} else if( $found && ($t != $offset)) {
 			if( $this->validDate( $t ) ) {
 				if($debug) echo 'OK' . "\n";
-				return $t;
+				$ts = $t;
 			} else {
 				if($debug) echo 'Invalid' . "\n";
-				return $this->findNext($t);
+				$ts = $this->findNext($t);
 			}
 		} else {
 			if($debug) echo 'Not found' . "\n";
-			return $this->findNext( $this->findStartingPoint( $offset, $this->rules['interval'] ) );
+			$ts = $this->findNext( $this->findStartingPoint( $offset, $this->rules['interval'] ) );
 		}
+		if ($ts && in_array($ts, $this->excluded))
+			return $this->findNext($ts);
+		
+		return $ts;
 	}
 
 	/**
@@ -452,6 +455,10 @@ class SG_iCal_Freq {
 
 	private function validDate( $t ) {
 		if( isset($this->rules['until']) && $t > $this->rules['until'] ) {
+			return false;
+		}
+		
+		if (in_array($t, $this->excluded)) {
 			return false;
 		}
 

@@ -26,6 +26,7 @@ class SG_iCal_VEvent {
 	protected $location;
 
 	public $recurrence;
+	public $excluded;
 	public $freq; //getFrequency()
 
 	public $data;
@@ -37,20 +38,28 @@ class SG_iCal_VEvent {
 	 * @param SG_iCalReader $ical
 	 */
 	public function __construct($data, SG_iCal $ical) {
-		
+
 		$this->uid = $data['uid']->getData();
 		unset($data['uid']);
 
 		if ( isset($data['rrule']) ) {
 			$this->recurrence = new SG_iCal_Recurrence($data['rrule']);
 			unset($data['rrule']);
+			
+			//exclusions
+			if ( isset($data['exdate']) ) {
+				foreach ($data['exdate'] as $exdate) {
+					$this->excluded[] = $this->getTimestamp($exdate, $ical);
+				}
+				unset($data['exdate']);
+			}
 		}
 
 		if( isset($data['dtstart']) ) {
 			$this->start = $this->getTimestamp($data['dtstart'], $ical);
 			unset($data['dtstart']);
 		}
-		
+
 		if( isset($data['dtend']) ) {
 			$this->end = $this->getTimestamp($data['dtend'], $ical);
 			unset($data['dtend']);
@@ -59,7 +68,7 @@ class SG_iCal_VEvent {
 			$this->end = $this->start + $dur->getDuration();
 			unset($data['duration']);
 		}
-		
+
 		//google cal set dtend as end of initial event (duration)
 		if ( isset($this->recurrence) ) {
 			//if there is a recurrence rule
@@ -70,7 +79,7 @@ class SG_iCal_VEvent {
 				//ok..
 			} elseif ($count) {
 				//if count is set, then figure out the last occurrence and set that as the end date
-				$this->freq = new SG_iCal_Freq($this->recurrence->rrule, $start);
+				$this->freq = new SG_iCal_Freq($this->recurrence->rrule, $start, $this->excluded);
 				$until = $this->freq->lastOccurrence($this->start);
 			} else {
 				//forever... limit to 3 years
@@ -105,7 +114,7 @@ class SG_iCal_VEvent {
 	public function getFrequency() {
 		if (! isset($this->freq)) {
 			if ( isset($this->recurrence) ) {
-				$this->freq = new SG_iCal_Freq($this->recurrence->rrule, $this->start);
+				$this->freq = new SG_iCal_Freq($this->recurrence->rrule, $this->start, $this->excluded);
 			}
 		}
 		return $this->freq;

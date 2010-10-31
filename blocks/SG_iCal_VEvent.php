@@ -45,14 +45,6 @@ class SG_iCal_VEvent {
 		if ( isset($data['rrule']) ) {
 			$this->recurrence = new SG_iCal_Recurrence($data['rrule']);
 			unset($data['rrule']);
-
-			//exclusions
-			if ( isset($data['exdate']) ) {
-				foreach ($data['exdate'] as $exdate) {
-					$this->excluded[] = $this->getTimestamp($exdate, $ical);
-				}
-				unset($data['exdate']);
-			}
 		}
 
 		if( isset($data['dtstart']) ) {
@@ -72,6 +64,18 @@ class SG_iCal_VEvent {
 		//google cal set dtend as end of initial event (duration)
 		if ( isset($this->recurrence) ) {
 			//if there is a recurrence rule
+
+			//exclusions
+			if ( isset($data['exdate']) ) {
+				foreach ($data['exdate'] as $exdate) {
+					//$this->excluded[] = $this->getTimestamp($exdate, $ical);
+					foreach ($exdate->getDataAsArray() as $ts) {
+						$this->excluded[] = strtotime($ts);
+					}
+				}
+				unset($data['exdate']);
+			}
+
 			$until = $this->recurrence->getUntil();
 			$count = $this->recurrence->getCount();
 			//check if there is either 'until' or 'count' set

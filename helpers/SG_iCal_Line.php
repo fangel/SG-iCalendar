@@ -76,6 +76,18 @@ class SG_iCal_Line implements ArrayAccess, Countable, IteratorAggregate {
 	}
 
 	/**
+	 * Returns the content of the line
+	 * @return string
+	 */
+	public function getDataAsArray() {
+		if (strpos($this->data,",") !== false) {
+			return explode(",",$this->data);
+		}
+		else
+			return array($this->data);
+	}
+
+	/**
 	 * A static helper to get a array of SG_iCal_Line's, and calls
 	 * getData() on each of them to lay the data "bare"..
 	 *

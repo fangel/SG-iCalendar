@@ -93,6 +93,7 @@ class SG_iCal_Parser {
 	 */
 	private static function _Parse( $content, SG_iCal $ical ) {
 		$main_sections = array('vevent', 'vjournal', 'vtodo', 'vtimezone', 'vcalendar');
+		$array_idents = array('exdate');
 		$sections = array();
 		$section = '';
 		$current_data = array();
@@ -120,11 +121,11 @@ class SG_iCal_Parser {
 						// This section is in the main section
 						if( $section == $s ) {
 							// It _is_ the main section else
-							if ($line->getIdent() != "exdate")
-								$current_data[$s][$line->getIdent()] = $line;
-							else {
+							if (in_array($line->getIdent(), $array_idents))
 								//exdate could appears more that once
 								$current_data[$s][$line->getIdent()][] = $line;
+							else {
+								$current_data[$s][$line->getIdent()] = $line;
 							}
 						} else {
 							// Sub section

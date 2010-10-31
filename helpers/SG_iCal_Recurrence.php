@@ -15,12 +15,12 @@
 class SG_iCal_Recurrence {
 
 	public $rrule;
-	
+
 	protected $freq;
 
 	protected $until;
 	protected $count;
-	
+
 	protected $interval;
 	protected $bysecond;
 	protected $byminute;
@@ -31,6 +31,7 @@ class SG_iCal_Recurrence {
 	protected $byyearno;
 	protected $bymonth;
 	protected $bysetpos;
+
 	protected $wkst;
 
 	/**
@@ -58,7 +59,7 @@ class SG_iCal_Recurrence {
 	 */
 	protected function parseLine($line) {
 		$this->rrule = $line;
-		
+
 		//split up the properties
 		$recurProperties = explode(';', $line);
 		$recur = array();

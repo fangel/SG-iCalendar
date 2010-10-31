@@ -11,16 +11,16 @@
  */
 class SG_iCal_VCalendar implements IteratorAggregate {
 	protected $data;
-	
+
 	/**
 	 * Creates a new SG_iCal_VCalendar.
 	 */
 	public function __construct($data) {
 		$this->data = $data;
 	}
-	
+
 	/**
-	 * Returns the title of the calendar. If no title is known, NULL 
+	 * Returns the title of the calendar. If no title is known, NULL
 	 * will be returned
 	 * @return string
 	 */
@@ -31,7 +31,7 @@ class SG_iCal_VCalendar implements IteratorAggregate {
 			return null;
 		}
 	}
-	
+
 	/**
 	 * Returns the description of the calendar. If no description is
 	 * known, NULL will be returned.
@@ -44,7 +44,7 @@ class SG_iCal_VCalendar implements IteratorAggregate {
 			return null;
 		}
 	}
-	
+
 	/**
 	 * @see IteratorAggregate.getIterator()
 	 */

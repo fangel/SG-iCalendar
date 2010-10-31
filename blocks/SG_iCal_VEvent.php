@@ -1,12 +1,12 @@
 <?php // BUILD: Remove line
 
 /**
- * The wrapper for vevents. Will reveal a unified and simple api for 
+ * The wrapper for vevents. Will reveal a unified and simple api for
  * the events, which include always finding a start and end (except
- * when no end or duration is given) and checking if the event is 
+ * when no end or duration is given) and checking if the event is
  * blocking or similar.
  *
- * Will apply the specified timezone to timestamps if a tzid is 
+ * Will apply the specified timezone to timestamps if a tzid is
  * specified
  *
  * @package SG_iCalReader
@@ -32,7 +32,7 @@ class SG_iCal_VEvent {
 	public $data;
 
 	/**
-	 * Constructs a new SG_iCal_VEvent. Needs the SG_iCalReader 
+	 * Constructs a new SG_iCal_VEvent. Needs the SG_iCalReader
 	 * supplied so it can query for timezones.
 	 * @param SG_iCal_Line[] $data
 	 * @param SG_iCalReader $ical
@@ -45,7 +45,7 @@ class SG_iCal_VEvent {
 		if ( isset($data['rrule']) ) {
 			$this->recurrence = new SG_iCal_Recurrence($data['rrule']);
 			unset($data['rrule']);
-			
+
 			//exclusions
 			if ( isset($data['exdate']) ) {
 				foreach ($data['exdate'] as $exdate) {
@@ -98,15 +98,15 @@ class SG_iCal_VEvent {
 				unset($data[$import]);
 			}
 		}
-		
+
 		if( isset($this->previous_tz) ) {
 			date_default_timezone_set($this->previous_tz);
 		}
-		
+
 		$this->data = SG_iCal_Line::Remove_Line($data);
 	}
-	
-	
+
+
 	/**
 	 * Returns the Event Occurrences Iterator (if recurrence set)
 	 * @return SG_iCal_Freq
@@ -119,7 +119,7 @@ class SG_iCal_VEvent {
 		}
 		return $this->freq;
 	}
-	
+
 	/**
 	 * Returns the UID of the event
 	 * @return string
@@ -127,7 +127,7 @@ class SG_iCal_VEvent {
 	public function getUID() {
 		return $this->uid;
 	}
-	
+
 	/**
 	 * Returns the summary (or null if none is given) of the event
 	 * @return string
@@ -135,7 +135,7 @@ class SG_iCal_VEvent {
 	public function getSummary() {
 		return $this->summary;
 	}
-	
+
 	/**
 	 * Returns the description (or null if none is given) of the event
 	 * @return string
@@ -143,7 +143,7 @@ class SG_iCal_VEvent {
 	public function getDescription() {
 		return $this->description;
 	}
-	
+
 	/**
 	 * Returns the location (or null if none is given) of the event
 	 * @return string
@@ -151,7 +151,7 @@ class SG_iCal_VEvent {
 	public function getLocation() {
 		return $this->location;
 	}
-	
+
 	/**
 	 * Returns true if the event is blocking (ie not transparent)
 	 * @return bool
@@ -159,7 +159,7 @@ class SG_iCal_VEvent {
 	public function isBlocking() {
 		return !(isset($this->data['transp']) && $this->data['transp'] == 'TRANSPARENT');
 	}
-	
+
 	/**
 	 * Returns true if the event is confirmed
 	 * @return bool
@@ -171,7 +171,7 @@ class SG_iCal_VEvent {
 			return $this->data['status'] == 'CONFIRMED';
 		}
 	}
-	
+
 	/**
 	 * Returns the timestamp for the beginning of the event
 	 * @return int
@@ -179,7 +179,7 @@ class SG_iCal_VEvent {
 	public function getStart() {
 		return $this->start;
 	}
-	
+
 	/**
 	 * Returns the timestamp for the end of the event
 	 * @return int
@@ -195,7 +195,7 @@ class SG_iCal_VEvent {
 	public function getRangeEnd() {
 		return max($this->end,$this->lastend);
 	}
-	
+
 	/**
 	 * Returns the duration of this event in seconds
 	 * @return int
@@ -203,7 +203,7 @@ class SG_iCal_VEvent {
 	public function getDuration() {
 		return $this->end - $this->start;
 	}
-	
+
 	/**
 	 * Returns true if duration is multiple of 86400
 	 * @return bool
@@ -215,7 +215,7 @@ class SG_iCal_VEvent {
 		}
 		return false;
 	}
-	
+
 	/**
 	 * Returns the given property of the event.
 	 * @param string $prop
@@ -230,9 +230,9 @@ class SG_iCal_VEvent {
 			return null;
 		}
 	}
-	
-	
-	
+
+
+
 	/**
 	 * Set default timezone (temporary) to get timestamps
 	 * @return string
@@ -248,14 +248,14 @@ class SG_iCal_VEvent {
 		}
 		return false;
 	}
-	
+
 	/**
 	 * Calculates the timestamp from a DT line.
 	 * @param $line SG_iCal_Line
 	 * @return int
 	 */
 	protected function getTimestamp( SG_iCal_Line $line, SG_iCal $ical ) {
-		
+
 		if( isset($line['tzid']) ) {
 			$this->setLineTimeZone($line);
 			//$tz = $ical->getTimeZoneInfo($line['tzid']);

@@ -69,7 +69,7 @@ class SG_iCal_Freq {
 				$this->rules['bymonthday'] = date('d', $this->start);
 			}
 		}
-		
+
 		//set until, and cache
 		if( isset($this->rules['count']) ) {
 			$ts = $this->start;
@@ -83,7 +83,7 @@ class SG_iCal_Freq {
 		}
 	}
 
-	
+
 	/**
 	 * Returns all timestamps array(), build the cache if not made before
 	 * @return array
@@ -192,7 +192,7 @@ class SG_iCal_Freq {
 					return $ts;
 			}
 		}
-		
+
 		$debug = false;
 
 		//make sure the offset is valid
@@ -268,7 +268,7 @@ class SG_iCal_Freq {
 		}
 		if ($ts && in_array($ts, $this->excluded))
 			return $this->findNext($ts);
-		
+
 		return $ts;
 	}
 
@@ -461,7 +461,7 @@ class SG_iCal_Freq {
 		if( isset($this->rules['until']) && $t > $this->rules['until'] ) {
 			return false;
 		}
-		
+
 		if (in_array($t, $this->excluded)) {
 			return false;
 		}

@@ -57,10 +57,11 @@ class SG_iCal_Recurrence {
 	 * @param string $line the line to be parsed
 	 */
 	protected function parseLine($line) {
+		$this->rrule = $line;
+		
 		//split up the properties
 		$recurProperties = explode(';', $line);
 		$recur = array();
-		$this->rrule = $line;
 
 		//loop through the properties in the line and set their associated
 		//member variables

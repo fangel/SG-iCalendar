@@ -605,13 +605,28 @@ class FreqTest extends PHPUnit_Framework_TestCase {
 		}
 	}
 
-	//weird : in this test $start is not a matched occurrence but...
+	/*
+	weird : in this test $start is not a matched occurrence but...
+	
+	to do something like that, we need EXDATE :
+	DTSTART;TZID=US-Eastern:19970902T090000
+	EXDATE;TZID=US-Eastern:19970902T090000
+	RRULE:FREQ=MONTHLY;BYDAY=FR;BYMONTHDAY=13
+	*/
+	
 	public function testFirstOccurrencesByYearDay() {
 		$rule = 'FREQ=YEARLY;INTERVAL=2;BYYEARDAY=1;COUNT=5';
 		$start = strtotime('2009-10-27T090000');
 		$freq = new SG_iCal_Freq($rule, $start);
 		$this->assertEquals(strtotime('2009-10-27T09:00:00'), $freq->firstOccurrence());
 		$this->assertEquals(strtotime('2011-01-01T09:00:00'), $freq->nextOccurrence($start));
+	}
+	
+	public function testFirstOccurrencesByYearDayWithoutFirstDate() {
+		$rule = 'FREQ=YEARLY;INTERVAL=2;BYYEARDAY=1;COUNT=5';
+		$start = strtotime('2009-10-27T090000');
+		$freq = new SG_iCal_Freq($rule, $start, array($start));
+		$this->assertEquals(strtotime('2011-01-01T09:00:00'), $freq->firstOccurrence());
 	}
 	
 	public function testLastOccurrenceByYearDay() {
@@ -626,13 +641,21 @@ class FreqTest extends PHPUnit_Framework_TestCase {
 		$start = strtotime('2011-01-01T090000');
 		$freq = new SG_iCal_Freq($rule, $start);
 		$this->assertEquals(5, count($freq->getAllOccurrences()));
-		$this->assertEquals(5, count($freq->getAllOccurrences()));
 		$this->assertEquals(strtotime('2019-01-01T09:00:00'), $freq->lastOccurrence());
 	}
 
-
-	// TODO: WKST rule
+	/* TODO: BYSETPOS rule :
+	The 3rd instance into the month of one of Tuesday, Wednesday or
+	Thursday, for the next 3 months:
 	
+		DTSTART;TZID=US-Eastern:19970904T090000
+		RRULE:FREQ=MONTHLY;COUNT=3;BYDAY=TU,WE,TH;BYSETPOS=3
+	*/
+	
+	/* TODO: WKST rule
+	*/
+	
+	//check a serie of dates
 	private function assertRule( $rule, $start, $dateset ) {
 		$freq = new SG_iCal_Freq($rule, $start);
 		reset($dateset);

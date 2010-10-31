@@ -144,7 +144,10 @@ class SG_iCal_Freq {
 	 * @return int timestamp
 	 */
 	public function firstOccurrence() {
-		return $this->start;
+		$t = $this->start;
+		if (in_array($t, $this->excluded))
+			$t = $this->findNext($t);
+		return $t;
 	}
 
 	/**

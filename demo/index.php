@@ -5,8 +5,8 @@ require_once('../SG_iCal.php');
 function dump_t($x) {
 	echo "<pre>".print_r($x,true)."</pre>";	
 }
-
-$ICS = "basic.ics";
+$ICS = "exdate.ics";
+//echo dump_t(file_get_contents($ICS));
 
 $ical = new SG_iCalReader($ICS);
 $query = new SG_iCal_Query();
@@ -24,16 +24,15 @@ foreach($evts as $id => $ev) {
 		"end"   => $ev->getEnd()-1,
 		"allDay" => $ev->isWholeDay()
 	);
-
-	$data[] = $jsEvt;
 	
 	if (isset($ev->recurrence)) {
-		$count = 1;
+		$count = 0;
 		$start = $ev->getStart();
-		//$freq = new SG_iCal_Freq($ev->recurrence->rrule, $start);
 		$freq = $ev->getFrequency();
+		if ($freq->firstOccurrence() == $start)
+			$data[] = $jsEvt;
 		while (($next = $freq->nextOccurrence($start)) > 0 ) {
-			if (!$next or $count >= 200) break;
+			if (!$next or $count >= 1000) break;
 			$count++;
 			$start = $next;
 			$jsEvt["start"] = $start;
@@ -41,7 +40,8 @@ foreach($evts as $id => $ev) {
 			
 			$data[] = $jsEvt;
 		}
-	}
+	} else
+		$data[] = $jsEvt;
 	
 }
 //echo(date('Ymd\n',$data[0][start]));

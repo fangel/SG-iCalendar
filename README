@@ -1,4 +1,19 @@
+A simple and fast iCal parser.
+http://github.com/tpruvot/PHP-iCal
+
 About this fork (forked at v0.5.0 from http://github.com/fangel/SG-iCalendar)
+
+A simple example :
+ $ical = new SG_iCalReader( "./basic.ics" );
+ //or
+ $ical = new SG_iCalReader( "http://example.com/calendar.ics" );
+ foreach( $ical->getEvents() As $event ) {
+   // Do stuff with the event $event
+ }
+
+To check unit tests with phpunit, goto tests/ directory and :
+ phpunit AllTests
+ phpunit helpers/FreqTest
 
 Changelog :
 
@@ -14,4 +29,3 @@ Changelog :
  + Support of Recurrent events in query Between()
  * various fixes on actual (5) issues
 
-Fixed 

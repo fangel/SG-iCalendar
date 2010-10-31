@@ -93,7 +93,7 @@ class SG_iCal_Parser {
 	 */
 	private static function _Parse( $content, SG_iCal $ical ) {
 		$main_sections = array('vevent', 'vjournal', 'vtodo', 'vtimezone', 'vcalendar');
-		$array_idents = array('exdate');
+		$array_idents = array('exdate','rdate');
 		$sections = array();
 		$section = '';
 		$current_data = array();

@@ -33,17 +33,20 @@ class SG_iCal_Freq {
 	protected $freq = '';
 
 	protected $excluded; //EXDATE
+	protected $added;    //RDATE
 
-	public $cache;
+	protected $cache; // getAllOccurrences()
 
 	/**
 	 * Constructs a new Freqency-rule
 	 * @param $rule string
 	 * @param $start int Unix-timestamp (important : Need to be the start of Event)
+	 * @param $excluded array of int (timestamps), see EXDATE documentation
+	 * @param $added array of int (timestamps), see RDATE documentation
 	 */
-	public function __construct( $rule, $start, $excluded=array()) {
+	public function __construct( $rule, $start, $excluded=array(), $added=array()) {
 		$this->start = $start;
-		$this->excluded = $excluded;
+		$this->excluded = array();
 
 		$rules = array();
 		foreach( explode(';', $rule) AS $v) {
@@ -72,15 +75,31 @@ class SG_iCal_Freq {
 
 		//set until, and cache
 		if( isset($this->rules['count']) ) {
-			$ts = $this->start;
-			$cache[0] = $ts;
+
+			$cache[$ts] = $ts = $this->start;
 			for($n=1; $n < $this->rules['count']; $n++) {
 				$ts = $this->findNext($ts);
-				$cache[$n] = $ts;
+				$cache[$ts] = $ts;
 			}
 			$this->rules['until'] = $ts;
-			$this->cache = $cache;
+
+			//EXDATE
+			if (!empty($excluded)) {
+				foreach($excluded as $ts) {
+					unset($cache[$ts]);
+				}
+			}
+			//RDATE
+			if (!empty($added)) {
+				$cache = $cache + $added;
+				asort($cache);
+			}
+
+			$this->cache = array_values($cache);
 		}
+		
+		$this->excluded = $excluded;
+		$this->added = $added;
 	}
 
 
@@ -91,11 +110,14 @@ class SG_iCal_Freq {
 	public function getAllOccurrences() {
 		if (empty($this->cache)) {
 			//build cache
-			$n=0; $cache[$n] = $this->start;
-			$next = $this->findNext($this->start);
+			$next = $this->firstOccurrence();
 			while ($next) {
-				$n++; $cache[$n] = $next;
+				$cache[] = $next;
 				$next = $this->findNext($next);
+			}
+			if (!empty($this->added)) {
+				$cache = $cache + $this->added;
+				asort($cache);
 			}
 			$this->cache = $cache;
 		}

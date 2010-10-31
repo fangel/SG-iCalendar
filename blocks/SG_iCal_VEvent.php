@@ -17,17 +17,23 @@ class SG_iCal_VEvent {
 	const DEFAULT_CONFIRMED = true;
 
 	protected $uid;
+
 	protected $start;
 	protected $end;
-	protected $laststart;
-	protected $lastend;
+
 	protected $summary;
 	protected $description;
 	protected $location;
 
-	public $recurrence;
-	public $excluded;
-	public $freq; //getFrequency()
+	protected $laststart;
+	protected $lastend;
+
+	public $recurrence; //RRULE
+	public $recurex;    //EXRULE
+	public $excluded;   //EXDATE(s)
+	public $added;      //RDATE(s)
+
+	public $freq; //getFrequency() SG_iCal_Freq
 
 	public $data;
 
@@ -45,6 +51,11 @@ class SG_iCal_VEvent {
 		if ( isset($data['rrule']) ) {
 			$this->recurrence = new SG_iCal_Recurrence($data['rrule']);
 			unset($data['rrule']);
+		}
+
+		if ( isset($data['exrule']) ) {
+			$this->recurex = new SG_iCal_Recurrence($data['exrule']);
+			unset($data['exrule']);
 		}
 
 		if( isset($data['dtstart']) ) {
@@ -68,12 +79,20 @@ class SG_iCal_VEvent {
 			//exclusions
 			if ( isset($data['exdate']) ) {
 				foreach ($data['exdate'] as $exdate) {
-					//$this->excluded[] = $this->getTimestamp($exdate, $ical);
 					foreach ($exdate->getDataAsArray() as $ts) {
 						$this->excluded[] = strtotime($ts);
 					}
 				}
 				unset($data['exdate']);
+			}
+			//additions
+			if ( isset($data['rdate']) ) {
+				foreach ($data['rdate'] as $rdate) {
+					foreach ($rdate->getDataAsArray() as $ts) {
+						$this->added[] = strtotime($ts);
+					}
+				}
+				unset($data['rdate']);
 			}
 
 			$until = $this->recurrence->getUntil();
@@ -83,7 +102,7 @@ class SG_iCal_VEvent {
 				//ok..
 			} elseif ($count) {
 				//if count is set, then figure out the last occurrence and set that as the end date
-				$this->freq = new SG_iCal_Freq($this->recurrence->rrule, $start, $this->excluded);
+				$this->getFrequency();
 				$until = $this->freq->lastOccurrence($this->start);
 			} else {
 				//forever... limit to 3 years
@@ -118,7 +137,7 @@ class SG_iCal_VEvent {
 	public function getFrequency() {
 		if (! isset($this->freq)) {
 			if ( isset($this->recurrence) ) {
-				$this->freq = new SG_iCal_Freq($this->recurrence->rrule, $this->start, $this->excluded);
+				$this->freq = new SG_iCal_Freq($this->recurrence->rrule, $this->start, $this->excluded, $this->added);
 			}
 		}
 		return $this->freq;
@@ -177,6 +196,18 @@ class SG_iCal_VEvent {
 	}
 
 	/**
+	 * Returns true if duration is multiple of 86400
+	 * @return bool
+	 */
+	public function isWholeDay() {
+		$dur = $this->getDuration();
+		if ($dur > 0 && ($dur % 86400) == 0) {
+			return true;
+		}
+		return false;
+	}
+
+	/**
 	 * Returns the timestamp for the beginning of the event
 	 * @return int
 	 */
@@ -206,18 +237,6 @@ class SG_iCal_VEvent {
 	 */
 	public function getDuration() {
 		return $this->end - $this->start;
-	}
-
-	/**
-	 * Returns true if duration is multiple of 86400
-	 * @return bool
-	 */
-	public function isWholeDay() {
-		$dur = $this->getDuration();
-		if ($dur > 0 && ($dur % 86400) == 0) {
-			return true;
-		}
-		return false;
 	}
 
 	/**

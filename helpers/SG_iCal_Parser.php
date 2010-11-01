@@ -1,4 +1,4 @@
-<?php
+<?php // BUILD: Remove line
 
 class SG_iCal_Parser {
 	/**
@@ -11,7 +11,7 @@ class SG_iCal_Parser {
 		$content = self::UnfoldLines($content);
 		self::_Parse( $content, $ical );
 	}
-	
+
 	/**
 	 * Passes a text string on to be parsed
 	 * @param string $content
@@ -21,7 +21,7 @@ class SG_iCal_Parser {
 		$content = self::UnfoldLines($content);
 		self::_Parse( $content, $ical );
 	}
-	
+
 	/**
 	 * Fetches a resource and tries to make sure it's UTF8
 	 * encoded
@@ -29,7 +29,7 @@ class SG_iCal_Parser {
 	 */
 	protected static function Fetch( $resource ) {
 		$is_utf8 = true;
-		
+
 		if( is_file( $resource ) ) {
 			// The resource is a local file
 			$content = file_get_contents($resource);
@@ -59,16 +59,16 @@ class SG_iCal_Parser {
 				$is_utf8 = false;
 			}
 		}
-		
+
 		if( !$is_utf8 ) {
 			$content = utf8_encode($content);
 		}
-		
+
 		return $content;
 	}
-	
+
 	/**
-	 * Takes the string $content, and creates a array of iCal lines. 
+	 * Takes the string $content, and creates a array of iCal lines.
 	 * This includes unfolding multi-line entries into a single line.
 	 * @param $content string
 	 */
@@ -93,6 +93,7 @@ class SG_iCal_Parser {
 	 */
 	private static function _Parse( $content, SG_iCal $ical ) {
 		$main_sections = array('vevent', 'vjournal', 'vtodo', 'vtimezone', 'vcalendar');
+		$array_idents = array('exdate','rdate');
 		$sections = array();
 		$section = '';
 		$current_data = array();
@@ -119,11 +120,16 @@ class SG_iCal_Parser {
 					if( array_search($s, $sections) !== false ) {
 						// This section is in the main section
 						if( $section == $s ) {
-							// It _is_ the main section
-							$current_data[$s][$line->getIdent()] = $line; 
+							// It _is_ the main section else
+							if (in_array($line->getIdent(), $array_idents))
+								//exdate could appears more that once
+								$current_data[$s][$line->getIdent()][] = $line;
+							else {
+								$current_data[$s][$line->getIdent()] = $line;
+							}
 						} else {
 							// Sub section
-							$current_data[$s][$section][$line->getIdent()] = $line; 
+							$current_data[$s][$section][$line->getIdent()] = $line;
 						}
 						break;
 					}
@@ -155,10 +161,10 @@ class SG_iCal_Parser {
 	}
 
 	/**
-	 * This functions does some regexp checking to see if the value is 
+	 * This functions does some regexp checking to see if the value is
 	 * valid UTF-8.
 	 *
-	 * The function is from the book "Building Scalable Web Sites" by 
+	 * The function is from the book "Building Scalable Web Sites" by
 	 * Cal Henderson.
 	 *
 	 * @param string $data
@@ -181,7 +187,7 @@ class SG_iCal_Parser {
 		$rx .= '|^[\x80-\xBF]';
 
 		return ( ! (bool) preg_match('!'.$rx.'!', $data) );
-	}	
+	}
 }
 
 

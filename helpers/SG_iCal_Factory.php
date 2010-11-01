@@ -13,7 +13,7 @@ class SG_iCal_Factory {
 	/**
 	 * Returns a new block-object for the section/data-pair. The list
 	 * of returned objects is:
-	 * 
+	 *
 	 * vcalendar => SG_iCal_VCalendar
 	 * vtimezone => SG_iCal_VTimeZone
 	 * vevent => SG_iCal_VEvent
@@ -34,7 +34,7 @@ class SG_iCal_Factory {
 			case "vevent":
 				require_once dirname(__FILE__).'/../blocks/SG_iCal_VEvent.php'; // BUILD: Remove line
 				return new SG_iCal_VEvent($data, $ical );
-			
+
 			default:
 				return new ArrayObject(SG_iCal_Line::Remove_Line((array) $data) );
 		}

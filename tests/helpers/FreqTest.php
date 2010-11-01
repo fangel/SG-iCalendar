@@ -23,12 +23,12 @@ class FreqTest extends PHPUnit_Framework_TestCase {
 			873961200,
 			-1
 		);
-		
+
 		$rule = 'FREQ=DAILY;COUNT=10';
 		$start = strtotime('19970902T090000');
 		$this->assertRule( $rule, $start, $dateset);
 	}
-	
+
 	public function testDailyUntil() {
 		$dateset = array(
 			873183600,
@@ -43,15 +43,15 @@ class FreqTest extends PHPUnit_Framework_TestCase {
 			873961200,
 			874047600
 		);
-		
+
 		$rule = 'FREQ=DAILY;UNTIL=19971224T000000Z';
 		$start = strtotime('19970902T090000');
 		$this->assertRule( $rule, $start, $dateset);
-		
+
 		$freq = new SG_iCal_Freq($rule, $start);
 		$this->assertEquals(882864000, $freq->previousOccurrence(time()));
 	}
-	
+
 	public function testDailyInterval() {
 		$dateset = array(
 			873183600,
@@ -66,7 +66,7 @@ class FreqTest extends PHPUnit_Framework_TestCase {
 		$start = strtotime('19970902T090000');
 		$this->assertRule( $rule, $start, $dateset);
 	}
-	
+
 	public function testDailyIntervalCount() {
 		$dateset = array(
 			873183600,
@@ -80,7 +80,7 @@ class FreqTest extends PHPUnit_Framework_TestCase {
 		$start = strtotime('19970902T090000');
 		$this->assertRule( $rule, $start, $dateset);
 	}
-	
+
 	public function testDailyBydayBymonthUntil() {
 		$rules = array(
 			'FREQ=YEARLY;UNTIL=20000131T090000Z;BYMONTH=1;BYDAY=SU,MO,TU,WE,TH,FR,SA',
@@ -106,22 +106,22 @@ class FreqTest extends PHPUnit_Framework_TestCase {
 				946972800
 			)
 		);
-		
+
 		foreach( $rules As $rule ) {
 			$start = strtotime('19980101T090000');
 			$this->assertRule( $rule, $start, $datesets[0]);
-			
+
 			$start = strtotime('+1 year', $start);
 			$this->assertRule( $rule, $start, $datesets[1]);
-			
+
 			$start = strtotime('+1 year', $start);
 			$this->assertRule( $rule, $start, $datesets[2]);
-			
+
 			$freq = new SG_iCal_Freq($rule, $start);
 			$this->assertEquals(949305600, $freq->previousOccurrence(time()));
 		}
 	}
-	
+
 	public function testWeeklyCount() {
 		$dateset = array(
 			873183600,
@@ -140,7 +140,7 @@ class FreqTest extends PHPUnit_Framework_TestCase {
 		$start = strtotime('19970902T090000');
 		$this->assertRule( $rule, $start, $dateset);
 	}
-	
+
 	public function testWeeklyUntil() {
 		$dateset = array(
 			873183600,
@@ -158,11 +158,11 @@ class FreqTest extends PHPUnit_Framework_TestCase {
 		$rule = 'FREQ=WEEKLY;UNTIL=19971224T000000Z';
 		$start = strtotime('19970902T090000');
 		$this->assertRule( $rule, $start, $dateset);
-		
+
 		$freq = new SG_iCal_Freq($rule, $start);
 		$this->assertEquals(882864000, $freq->previousOccurrence(time()), 'Failed getting correct end date');
 	}
-	
+
 	public function testWeeklyBydayLimit() {
 		$rules = array(
 			'FREQ=WEEKLY;UNTIL=19971007T000000Z;WKST=SU;BYDAY=TU,TH',
@@ -186,7 +186,7 @@ class FreqTest extends PHPUnit_Framework_TestCase {
 			$this->assertRule( $rule, $start, $dateset);
 		}
 	}
-	
+
 	public function testWeeklyIntervalUntilByday() {
 		$dateset = array(
 			873183600,
@@ -204,11 +204,11 @@ class FreqTest extends PHPUnit_Framework_TestCase {
 		$rule = 'FREQ=WEEKLY;INTERVAL=2;UNTIL=19971224T000000Z;WKST=SU;BYDAY=MO,WE,FR';
 		$start = strtotime('19970902T090000');
 		$this->assertRule( $rule, $start, $dateset);
-		
+
 		$freq = new SG_iCal_Freq($rule, $start);
 		$this->assertEquals(882777600, $freq->previousOccurrence(time()), 'Failed getting correct end date');
 	}
-	
+
 	public function testWeeklyIntervalBydayCount() {
 		$dateset = array(
 			873183600,
@@ -225,7 +225,7 @@ class FreqTest extends PHPUnit_Framework_TestCase {
 		$start = strtotime('19970902T090000');
 		$this->assertRule( $rule, $start, $dateset);
 	}
-	
+
 	public function testMonthlyBydayCount() {
 		$dateset = array(
 			873442800,
@@ -244,7 +244,7 @@ class FreqTest extends PHPUnit_Framework_TestCase {
 		$start = strtotime('19970905T090000');
 		$this->assertRule( $rule, $start, $dateset);
 	}
-	
+
 	public function testMonthlyBydayUntil() {
 		$dateset = array(
 			873442800,
@@ -257,7 +257,7 @@ class FreqTest extends PHPUnit_Framework_TestCase {
 		$start = strtotime('19970905T090000');
 		$this->assertRule( $rule, $start, $dateset);
 	}
-	
+
 	public function testMonthlyIntervalBydayCount2() {
 		$dateset = array(
 			873615600,
@@ -291,7 +291,7 @@ class FreqTest extends PHPUnit_Framework_TestCase {
 		$start = strtotime('19970922T090000');
 		$this->assertRule( $rule, $start, $dateset);
 	}
-	
+
 	public function testMonthlyBymonthday() {
 		$dateset = array(
 			875430000,
@@ -305,7 +305,7 @@ class FreqTest extends PHPUnit_Framework_TestCase {
 		$start = strtotime('19970928T090000');
 		$this->assertRule( $rule, $start, $dateset);
 	}
-	
+
 	public function testMonthlyBymonthdayCount() {
 		$dateset = array(
 			873183600,
@@ -324,7 +324,7 @@ class FreqTest extends PHPUnit_Framework_TestCase {
 		$start = strtotime('19970902T090000');
 		$this->assertRule( $rule, $start, $dateset);
 	}
-	
+
 	public function testMonthlyBymonthdayCount2() {
 		$dateset = array(
 			875602800,
@@ -343,7 +343,7 @@ class FreqTest extends PHPUnit_Framework_TestCase {
 		$start = strtotime('19970930T090000');
 		$this->assertRule( $rule, $start, $dateset);
 	}
-	
+
 	public function testMonthlyIntervalBymonthdayCount() {
 		$dateset = array(
 			873874800,
@@ -362,7 +362,7 @@ class FreqTest extends PHPUnit_Framework_TestCase {
 		$start = strtotime('19970910T090000');
 		$this->assertRule( $rule, $start, $dateset);
 	}
-	
+
 	public function testMonthlyIntervalByday() {
 		$dateset = array(
 			873183600,
@@ -380,7 +380,7 @@ class FreqTest extends PHPUnit_Framework_TestCase {
 		$start = strtotime('19970902T090000');
 		$this->assertRule( $rule, $start, $dateset);
 	}
-	
+
 	public function testYearlyCountBymonth() {
 		$dateset = array(
 			865926000,
@@ -399,7 +399,7 @@ class FreqTest extends PHPUnit_Framework_TestCase {
 		$start = strtotime('19970610T090000');
 		$this->assertRule( $rule, $start, $dateset);
 	}
-	
+
 	public function testYearlyIntervalCountBymonth() {
 		$dateset = array(
 			857980800,
@@ -418,7 +418,7 @@ class FreqTest extends PHPUnit_Framework_TestCase {
 		$start = strtotime('19970310T090000');
 		$this->assertRule( $rule, $start, $dateset);
 	}
-	
+
 	public function testYearlyIntervalCountByyearday() {
 		$dateset = array(
 			852105600,
@@ -437,7 +437,7 @@ class FreqTest extends PHPUnit_Framework_TestCase {
 		$start = strtotime('19970101T090000');
 		$this->assertRule( $rule, $start, $dateset);
 	}
-	
+
 	public function testYearlyByday() {
 		$dateset = array(
 			864025200,
@@ -448,7 +448,7 @@ class FreqTest extends PHPUnit_Framework_TestCase {
 		$start = strtotime('19970519T090000');
 		$this->assertRule( $rule, $start, $dateset);
 	}
-	
+
 	public function testYearlyByweeknoByday() {
 		$dateset = array(
 			863420400,
@@ -509,7 +509,7 @@ class FreqTest extends PHPUnit_Framework_TestCase {
 		$start = strtotime('19970902T090000');
 		$this->assertRule( $rule, $start, $dateset);
 	}
-	
+
 	public function testYearlyBydayBymonthday2() {
 		$dateset = array(
 			874134000,
@@ -527,7 +527,7 @@ class FreqTest extends PHPUnit_Framework_TestCase {
 		$start = strtotime('19970913T090000');
 		$this->assertRule( $rule, $start, $dateset);
 	}
-	
+
 	public function testYearlyIntervalBymonthBydayBymonthday() {
 		$dateset = array(
 			847180800,
@@ -538,9 +538,9 @@ class FreqTest extends PHPUnit_Framework_TestCase {
 		$start = strtotime('19961105T090000');
 		$this->assertRule( $rule, $start, $dateset);
 	}
-	
+
 	// TODO: SETPOS rules
-	
+
 	public function testHourlyIntervalUntil() {
 		$dateset = array(
 			873183600,
@@ -552,7 +552,7 @@ class FreqTest extends PHPUnit_Framework_TestCase {
 		$start = strtotime('19970902T090000');
 		$this->assertRule( $rule, $start, $dateset);
 	}
-	
+
 	public function testMinutelyIntervalCount() {
 		$dateset = array(
 			873183600,
@@ -567,7 +567,7 @@ class FreqTest extends PHPUnit_Framework_TestCase {
 		$start = strtotime('19970902T090000');
 		$this->assertRule( $rule, $start, $dateset);
 	}
-	
+
 	public function testMinutelyIntervalCount2() {
 		$dateset = array(
 			873183600,
@@ -580,11 +580,11 @@ class FreqTest extends PHPUnit_Framework_TestCase {
 		$start = strtotime('19970902T090000');
 		$this->assertRule( $rule, $start, $dateset);
 	}
-	
+
 	public function testMinutelyIntervalByhour() {
 		$rules = array(
 			'FREQ=MINUTELY;INTERVAL=20;BYHOUR=9,10,11,12,13,14,15,16'/*,
-			'FREQ=DAILY;BYHOUR=9,10,11,12,13,14,15,16;BYMINUTE=0,20,40'*/ 
+			'FREQ=DAILY;BYHOUR=9,10,11,12,13,14,15,16;BYMINUTE=0,20,40'*/
 		);
 		// TODO: Fix it so multi byhour and byminute will work
 		$dateset = array(
@@ -605,21 +605,64 @@ class FreqTest extends PHPUnit_Framework_TestCase {
 		}
 	}
 
-	public function testLastOccurrence() {
+	/*
+	weird : in this test $start is not a matched occurrence but...
+
+	to do something like that, we need EXDATE :
+	DTSTART;TZID=US-Eastern:19970902T090000
+	EXDATE;TZID=US-Eastern:19970902T090000
+	RRULE:FREQ=MONTHLY;BYDAY=FR;BYMONTHDAY=13
+	*/
+
+	public function testFirstOccurrencesByYearDay() {
 		$rule = 'FREQ=YEARLY;INTERVAL=2;BYYEARDAY=1;COUNT=5';
 		$start = strtotime('2009-10-27T090000');
 		$freq = new SG_iCal_Freq($rule, $start);
-		$this->assertEquals(strtotime('2018-01-01T09:00:00'), $freq->lastOccurrence());
+		$this->assertEquals(strtotime('2009-10-27T09:00:00'), $freq->firstOccurrence());
+		$this->assertEquals(strtotime('2011-01-01T09:00:00'), $freq->nextOccurrence($start));
 	}
-	
-	// TODO: WKST rule
-	
+
+	public function testFirstOccurrencesByYearDayWithoutFirstDate() {
+		$rule = 'FREQ=YEARLY;INTERVAL=2;BYYEARDAY=1;COUNT=5';
+		$start = strtotime('2009-10-27T090000');
+		$freq = new SG_iCal_Freq($rule, $start, array($start));
+		$this->assertEquals(strtotime('2011-01-01T09:00:00'), $freq->firstOccurrence());
+	}
+
+	public function testLastOccurrenceByYearDay() {
+		$rule = 'FREQ=YEARLY;INTERVAL=2;BYYEARDAY=1;COUNT=5';
+		$start = strtotime('2011-01-01T090000');
+		$freq = new SG_iCal_Freq($rule, $start);
+		$this->assertEquals(strtotime('2019-01-01T09:00:00'), $freq->lastOccurrence());
+	}
+
+	public function testCacheCount() {
+		$rule = 'FREQ=YEARLY;INTERVAL=2;BYYEARDAY=1;COUNT=5';
+		$start = strtotime('2011-01-01T090000');
+		$freq = new SG_iCal_Freq($rule, $start);
+		$this->assertEquals(5, count($freq->getAllOccurrences()));
+		$this->assertEquals(strtotime('2019-01-01T09:00:00'), $freq->lastOccurrence());
+	}
+
+	/* TODO: BYSETPOS rule :
+	The 3rd instance into the month of one of Tuesday, Wednesday or
+	Thursday, for the next 3 months:
+
+		DTSTART;TZID=US-Eastern:19970904T090000
+		RRULE:FREQ=MONTHLY;COUNT=3;BYDAY=TU,WE,TH;BYSETPOS=3
+	*/
+
+	/* TODO: WKST rule
+	*/
+
+	//check a serie of dates
 	private function assertRule( $rule, $start, $dateset ) {
 		$freq = new SG_iCal_Freq($rule, $start);
 		reset($dateset);
 		$n = $start - 1;
 		do {
 			$n = $freq->findNext($n);
+			//echo date('Y-m-d H:i:sO ',$n);
 			$e = (current($dateset) != -1) ? current($dateset) : false;
 			$this->assertEquals($e, $n);
 		} while( next($dateset) !== false );

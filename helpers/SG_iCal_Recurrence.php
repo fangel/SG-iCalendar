@@ -14,11 +14,13 @@
  */
 class SG_iCal_Recurrence {
 
+	public $rrule;
+
 	protected $freq;
 
 	protected $until;
 	protected $count;
-	
+
 	protected $interval;
 	protected $bysecond;
 	protected $byminute;
@@ -29,6 +31,7 @@ class SG_iCal_Recurrence {
 	protected $byyearno;
 	protected $bymonth;
 	protected $bysetpos;
+
 	protected $wkst;
 
 	/**
@@ -39,7 +42,6 @@ class SG_iCal_Recurrence {
 		'bysecond', 'byminute', 'byhour', 'byday', 'bymonthday',
 		'byyearday', 'byyearno', 'bymonth', 'bysetpos'
 	);
-
 
 	/**
 	 * Creates an recurrence object with a passed in line.  Parses the line.
@@ -56,6 +58,8 @@ class SG_iCal_Recurrence {
 	 * @param string $line the line to be parsed
 	 */
 	protected function parseLine($line) {
+		$this->rrule = $line;
+
 		//split up the properties
 		$recurProperties = explode(';', $line);
 		$recur = array();
@@ -75,6 +79,18 @@ class SG_iCal_Recurrence {
 			}
 			$this->$propertyName = $propertyValue;
 		}
+	}
+
+	/**
+	 * Set the $until member
+	 * @param mixed timestamp (int) / Valid DateTime format (string)
+	 */
+	public function setUntil($ts) {
+		if ( is_int($ts) )
+			$dt = new DateTime('@'.$ts);
+		else
+			$dt = new DateTime($ts);
+		$this->until = $dt->format('Ymd\THisO');
 	}
 
 	/**
@@ -103,7 +119,6 @@ class SG_iCal_Recurrence {
 	 * @return mixed string if the member has been set, false otherwise
 	 */
 	public function getUntil() {
-
 		return $this->getMember('until');
 	}
 

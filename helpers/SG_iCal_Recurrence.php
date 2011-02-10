@@ -28,7 +28,7 @@ class SG_iCal_Recurrence {
 	protected $byday;
 	protected $bymonthday;
 	protected $byyearday;
-	protected $byyearno;
+	protected $byweekno;
 	protected $bymonth;
 	protected $bysetpos;
 
@@ -40,7 +40,7 @@ class SG_iCal_Recurrence {
 	 */
 	protected $listProperties = array(
 		'bysecond', 'byminute', 'byhour', 'byday', 'bymonthday',
-		'byyearday', 'byyearno', 'bymonth', 'bysetpos'
+		'byyearday', 'byweekno', 'bymonth', 'bysetpos'
 	);
 
 	/**
@@ -188,11 +188,11 @@ class SG_iCal_Recurrence {
 	}
 
 	/**
-	 * Corresponds to BYYEARNO in RFC 2445.
+	 * Corresponds to BYWEEKNO in RFC 2445.
 	 * @return mixed string if the member has been set, false otherwise
 	 */
-	public function getByYearNo() {
-		return $this->getMember('byyearno');
+	public function getByWeekNo() {
+		return $this->getMember('byweekno');
 	}
 
 	/**

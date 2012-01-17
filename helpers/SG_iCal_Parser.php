@@ -44,7 +44,7 @@ class SG_iCal_Parser {
 			$c = curl_init();
 			curl_setopt($c, CURLOPT_URL, $resource);
 			curl_setopt($c, CURLOPT_RETURNTRANSFER, true);
-			if( !ini_get('safe_mode') ){
+			if( !ini_get('safe_mode') && !ini_get('open_basedir') ){
 				curl_setopt($c, CURLOPT_FOLLOWLOCATION, true);
 			}
 			$content = curl_exec($c);

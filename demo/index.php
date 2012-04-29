@@ -12,7 +12,8 @@ $ical = new SG_iCalReader($ICS);
 $query = new SG_iCal_Query();
 
 $evts = $ical->getEvents();
-//$evts = $query->Between($ical,strtotime('20100901'),strtotime('20101131'));
+//$evts = $query->Between($ical,20100901,20101131); -- Unix time
+//$evts = $query->Between($ical,strtotime("1/10/2010"),strtotime("1/10/2011")); -- Human readable time.
 
 
 $data = array();

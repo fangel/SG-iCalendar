@@ -167,6 +167,8 @@ class SG_iCal_Freq {
 	 */
 	public function firstOccurrence() {
 		$t = $this->start;
+        if( $this->excluded == null ) return $t;
+        
 		if (in_array($t, $this->excluded))
 			$t = $this->findNext($t);
 		return $t;
@@ -483,10 +485,12 @@ class SG_iCal_Freq {
 		if( isset($this->rules['until']) && $t > $this->rules['until'] ) {
 			return false;
 		}
-
-		if (in_array($t, $this->excluded)) {
-			return false;
-		}
+        
+        if( $this->excluded != null){
+            if (in_array($t, $this->excluded)) {
+			     return false;
+		    }
+        }
 
 		if( isset($this->rules['bymonth']) ) {
 			$months = explode(',', $this->rules['bymonth']);

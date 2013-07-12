@@ -290,6 +290,9 @@ class SG_iCal_Freq {
 			if($debug) echo 'Not found' . "\n";
 			$ts = $this->findNext( $this->findStartingPoint( $offset, $this->rules['interval'] ) );
 		}
+        
+        if( $this->excluded == null ) return $ts;
+        
 		if ($ts && in_array($ts, $this->excluded))
 			return $this->findNext($ts);
 

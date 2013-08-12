@@ -46,7 +46,6 @@ class SG_iCal_Freq {
 	 */
 	public function __construct( $rule, $start, $excluded=array(), $added=array()) {
 		$this->start = $start;
-		$this->excluded = array();
 
 		$rules = array();
 		foreach( explode(';', $rule) AS $v) {
@@ -98,7 +97,11 @@ class SG_iCal_Freq {
 			$this->cache = array_values($cache);
 		}
 
-		$this->excluded = $excluded;
+        if( !is_array( $excluded ) ){
+		   $this->excluded = array();
+        } else {
+           $this->excluded = $excluded; 
+        }
 		$this->added = $added;
 	}
 
@@ -234,6 +237,8 @@ class SG_iCal_Freq {
 		$minute = (($this->freq == 'minutely' || isset($this->rules['byminute'])) && $offset > $this->start) ? date('i', $offset) : date('i', $this->start);
 		$t = mktime($hour, $minute, date('s', $this->start), date('m', $offset), date('d', $offset), date('Y',$offset));
 		if($debug) echo 'START: ' . date('r', $t) . "\n";
+
+       
 
 		if( $this->simpleMode ) {
 			if( $offset < $t ) {

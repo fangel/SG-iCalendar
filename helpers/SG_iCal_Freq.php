@@ -98,10 +98,11 @@ class SG_iCal_Freq {
 		}
 
         if( !is_array( $excluded ) ){
-		   $this->excluded = array();
+            $this->excluded = array();
         } else {
-           $this->excluded = $excluded; 
+            $this->excluded = $excluded;
         }
+        
 		$this->added = $added;
 	}
 
@@ -170,8 +171,6 @@ class SG_iCal_Freq {
 	 */
 	public function firstOccurrence() {
 		$t = $this->start;
-        if( $this->excluded == null ) return $t;
-        
 		if (in_array($t, $this->excluded))
 			$t = $this->findNext($t);
 		return $t;
@@ -295,9 +294,7 @@ class SG_iCal_Freq {
 			if($debug) echo 'Not found' . "\n";
 			$ts = $this->findNext( $this->findStartingPoint( $offset, $this->rules['interval'] ) );
 		}
-        
-        if( $this->excluded == null ) return $ts;
-        
+
 		if ($ts && in_array($ts, $this->excluded))
 			return $this->findNext($ts);
 
@@ -493,12 +490,11 @@ class SG_iCal_Freq {
 		if( isset($this->rules['until']) && $t > $this->rules['until'] ) {
 			return false;
 		}
-        
-        if( $this->excluded != null){
-            if (in_array($t, $this->excluded)) {
+
+        if (in_array($t, $this->excluded)) {
 			     return false;
-		    }
-        }
+	    }
+
 
 		if( isset($this->rules['bymonth']) ) {
 			$months = explode(',', $this->rules['bymonth']);

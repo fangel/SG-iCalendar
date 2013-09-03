@@ -23,6 +23,9 @@
  * @license http://creativecommons.org/licenses/by-sa/2.5/dk/deed.en_GB CC-BY-SA-DK
  */
 class SG_iCal_Freq {
+    public $debug = false;
+    
+    
 	protected $weekdays = array('MO'=>'monday', 'TU'=>'tuesday', 'WE'=>'wednesday', 'TH'=>'thursday', 'FR'=>'friday', 'SA'=>'saturday', 'SU'=>'sunday');
 	protected $knownRules = array('month', 'weekno', 'day', 'monthday', 'yearday', 'hour', 'minute'); //others : 'setpos', 'second'
 	protected $ruleModifiers = array('wkst');
@@ -111,13 +114,16 @@ class SG_iCal_Freq {
 	 * Returns all timestamps array(), build the cache if not made before
 	 * @return array
 	 */
-	public function getAllOccurrences() {
+	public function getAllOccurrences($limit = false) {
 		if (empty($this->cache)) {
 			//build cache
 			$next = $this->firstOccurrence();
+            $count = 1;
 			while ($next) {
 				$cache[] = $next;
 				$next = $this->findNext($next);
+                $count++;
+                if( $limit && $limit == $count ) break;
 			}
 			if (!empty($this->added)) {
 				$cache = $cache + $this->added;
@@ -187,6 +193,11 @@ class SG_iCal_Freq {
 		//return last timestamp in cache
 		return end($this->cache);
 	}
+    
+    
+    function debug( $bool = true ){
+        $this->debug = $bool;
+    }
 
 	/**
 	 * Calculates the next time after the given offset that the rule
@@ -219,7 +230,7 @@ class SG_iCal_Freq {
 			}
 		}
 
-		$debug = false;
+		$debug = $this->debug;
 
 		//make sure the offset is valid
 		if( $offset === false || (isset($this->rules['until']) && $offset > $this->rules['until']) ) {
@@ -232,8 +243,13 @@ class SG_iCal_Freq {
 		//set the timestamp of the offset (ignoring hours and minutes unless we want them to be
 		//part of the calculations.
 		if($debug) echo 'O: ' . date('r', $offset) . "\n";
+        
+        
 		$hour = (in_array($this->freq, array('hourly','minutely')) && $offset > $this->start) ? date('H', $offset) : date('H', $this->start);
+        
+        
 		$minute = (($this->freq == 'minutely' || isset($this->rules['byminute'])) && $offset > $this->start) ? date('i', $offset) : date('i', $this->start);
+        
 		$t = mktime($hour, $minute, date('s', $this->start), date('m', $offset), date('d', $offset), date('Y',$offset));
 		if($debug) echo 'START: ' . date('r', $t) . "\n";
 

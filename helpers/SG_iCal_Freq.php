@@ -35,7 +35,7 @@ class SG_iCal_Freq {
 	protected $start = 0;
 	protected $freq = '';
 
-	protected $excluded; //EXDATE
+	protected $excluded = array(); //EXDATE
 	protected $added;    //RDATE
 
 	protected $cache; // getAllOccurrences()

@@ -44,6 +44,25 @@ class SG_iCal_VCalendar implements IteratorAggregate {
 			return null;
 		}
 	}
+    
+    
+    /**
+     * Returns the timezone of the calendar
+     * known, NULL will be returned.
+     * @return string
+     * 
+     * @since 9.13.13
+     * @author Mat Lipe
+     */
+    public function getTimezone() {
+        if( isset($this->data['x-wr-timezone']) ) {
+            return $this->data['x-wr-timezone'];
+        } else {
+            return null;
+        }
+    }
+    
+    
 
 	/**
 	 * @see IteratorAggregate.getIterator()

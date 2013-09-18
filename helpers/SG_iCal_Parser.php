@@ -44,11 +44,11 @@ class SG_iCal_Parser {
 			$c = curl_init();
 			curl_setopt($c, CURLOPT_URL, $resource);
 			curl_setopt($c, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($c, CURLOPT_SSL_VERIFYPEER, false);
 			if( !ini_get('safe_mode') && !ini_get('open_basedir') ){
 				curl_setopt($c, CURLOPT_FOLLOWLOCATION, true);
 			}
 			$content = curl_exec($c);
-
 			$ct = curl_getinfo($c, CURLINFO_CONTENT_TYPE);
 			$enc = preg_replace('/^.*charset=([-a-zA-Z0-9]+).*$/', '$1', $ct);
 			if( $ct != '' && strtolower(str_replace('-','', $enc)) != 'utf8' ) {

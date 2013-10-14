@@ -20,6 +20,7 @@
  *
  * @package SG_iCalReader
  * @author Morten Fangel (C) 2008
+ * 
  * @license http://creativecommons.org/licenses/by-sa/2.5/dk/deed.en_GB CC-BY-SA-DK
  */
 class SG_iCal_Freq {
@@ -59,6 +60,7 @@ class SG_iCal_Freq {
 		if( isset($this->rules['until']) && is_string($this->rules['until']) ) {
 			$this->rules['until'] = strtotime($this->rules['until']);
 		}
+
 		$this->freq = strtolower($this->rules['freq']);
 
 		foreach( $this->knownRules AS $rule ) {
@@ -131,6 +133,7 @@ class SG_iCal_Freq {
 			}
 			$this->cache = $cache;
 		}
+
 		return $this->cache;
 	}
 
@@ -271,13 +274,17 @@ class SG_iCal_Freq {
 
 		$eop = $this->findEndOfPeriod($offset);
 		if($debug) echo 'EOP: ' . date('r', $eop) . "\n";
+        
+        
+        
 
-		foreach( $this->knownRules AS $rule ) {
+		foreach( $this->knownRules AS $rule ) {           
 			if( $found && isset($this->rules['by' . $rule]) ) {
 				if( $this->isPrerule($rule, $this->freq) ) {
 					$subrules = explode(',', $this->rules['by' . $rule]);
 					$_t = null;
-					foreach( $subrules AS $subrule ) {
+					foreach( $subrules AS $subrule) {
+                        
 						$imm = call_user_func_array(array($this, 'ruleBy' . $rule), array($subrule, $t));
 						if( $imm === false ) {
 							break;
@@ -327,20 +334,26 @@ class SG_iCal_Freq {
 	 */
 	private function findStartingPoint( $offset, $interval, $truncate = true ) {
 		$_freq = ($this->freq == 'daily') ? 'day__' : $this->freq;
+
 		$t = '+' . $interval . ' ' . substr($_freq,0,-2) . 's';
 		if( $_freq == 'monthly' && $truncate ) {
+
 			if( $interval > 1) {
 				$offset = strtotime('+' . ($interval - 1) . ' months ', $offset);
 			}
 			$t = '+' . (date('t', $offset) - date('d', $offset) + 1) . ' days';
+
 		}
 
 		$sp = strtotime($t, $offset);
+        
+       
 
 		if( $truncate ) {
+
 			$sp = $this->truncateToPeriod($sp, $this->freq);
 		}
-
+       
 		return $sp;
 	}
 
@@ -396,6 +409,8 @@ class SG_iCal_Freq {
 	 * @param string $rule
 	 * @param int $t
 	 * @return int
+     * 
+     * @since 10.14.13
 	 */
 	private function ruleByday($rule, $t) {
 		$dir = ($rule{0} == '-') ? -1 : 1;
@@ -413,9 +428,19 @@ class SG_iCal_Freq {
 			$_t = strtotime($s, $t);
 
 			if( $_t == $t && in_array($this->freq, array('monthly', 'yearly')) ) {
-				// Yes. This is not a great idea.. but hey, it works.. for now
 				$s = 'next ' . $d . ' ' . date('H:i:s',$t);
 				$_t = strtotime($s, $_t);
+                
+                if( $this->freq == 'monthly' ){
+                    while( date( 'm', $_t) == date('m', $t ) ){
+                        $_t = strtotime($s, $_t);
+                    }
+                } elseif( $this->freq == 'yearly' ){
+                    while( date( 'y', $_t) == date('y', $t ) ){
+                        $_t = strtotime($s, $_t);
+                    }
+                    
+                }
 			}
 
 			return $_t;

@@ -44,11 +44,11 @@ class SG_iCal_Parser {
 			$c = curl_init();
 			curl_setopt($c, CURLOPT_URL, $resource);
 			curl_setopt($c, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($c, CURLOPT_SSL_VERIFYPEER, false);
 			if( !ini_get('safe_mode') && !ini_get('open_basedir') ){
 				curl_setopt($c, CURLOPT_FOLLOWLOCATION, true);
 			}
 			$content = curl_exec($c);
-
 			$ct = curl_getinfo($c, CURLINFO_CONTENT_TYPE);
 			$enc = preg_replace('/^.*charset=([-a-zA-Z0-9]+).*$/', '$1', $ct);
 			if( $ct != '' && strtolower(str_replace('-','', $enc)) != 'utf8' ) {
@@ -82,6 +82,7 @@ class SG_iCal_Parser {
 			}
 			$data[] = $line;
 		}
+
 		return $data;
 	}
 
@@ -93,7 +94,7 @@ class SG_iCal_Parser {
 	 */
 	private static function _Parse( $content, SG_iCal $ical ) {
 		$main_sections = array('vevent', 'vjournal', 'vtodo', 'vtimezone', 'vcalendar');
-		$array_idents = array('exdate','rdate');
+		$array_idents = array('exdate','rdate','attach');
 		$sections = array();
 		$section = '';
 		$current_data = array();
@@ -120,6 +121,7 @@ class SG_iCal_Parser {
 					if( array_search($s, $sections) !== false ) {
 						// This section is in the main section
 						if( $section == $s ) {
+                            
 							// It _is_ the main section else
 							if (in_array($line->getIdent(), $array_idents))
 								//exdate could appears more that once
@@ -136,6 +138,8 @@ class SG_iCal_Parser {
 				}
 			}
 		}
+
+
 		$current_data = array();
 	}
 

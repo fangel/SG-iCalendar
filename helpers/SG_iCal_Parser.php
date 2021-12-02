@@ -77,7 +77,7 @@ class SG_iCal_Parser {
 		$content = explode("\n", $content);
 		for( $i=0; $i < count($content); $i++) {
 			$line = rtrim($content[$i], "\n\r\t\v\0");
-			while( isset($content[$i+1]) && strlen($content[$i+1]) > 0 && ($content[$i+1]{0} == ' ' || $content[$i+1]{0} == "\t" )) {
+			while( isset($content[$i+1]) && strlen($content[$i+1]) > 0 && ($content[$i+1][0] == ' ' || $content[$i+1][0] == "\t" )) {
 				$line .= rtrim(substr($content[++$i],1), "\n\r\t\v\0");
 			}
 			$data[] = $line;

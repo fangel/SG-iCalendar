@@ -375,7 +375,7 @@ class SG_iCal_Freq {
 	 * @return int
 	 */
 	private function ruleByday($rule, $t) {
-		$dir = ($rule{0} == '-') ? -1 : 1;
+		$dir = ($rule[0] == '-') ? -1 : 1;
 		$dir_t = ($dir == 1) ? 'next' : 'last';
 
 

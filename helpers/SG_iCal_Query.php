@@ -76,7 +76,9 @@ class SG_iCal_Query {
 			throw new Exception('SG_iCal_Query::Sort called with invalid input!');
 		}
 
-		$cmp = create_function('$a, $b', 'return strcmp($a->getProperty("' . $column . '"), $b->getProperty("' . $column . '"));');
+		$cmp = function ($a, $b) use (&$column) {
+			return strcmp($a->getProperty("' . $column . '"), $b->getProperty("' . $column . '"));
+		};
 		usort($ical, $cmp);
 		return $ical;
 	}
